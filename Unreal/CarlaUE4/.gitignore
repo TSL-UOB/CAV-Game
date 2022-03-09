@@ -13,7 +13,13 @@ Plugins/Carla/DerivedDataCache
 Plugins/Carla/Intermediate
 Plugins/Carla/Saved
 
-/Content
+/Content/Carla/Config
+/Content/Carla/HDMaps
+/Content/Carla/hooks
+/Content/Carla/Maps
+/Content/Carla/Static
+/Content/Carla/LICENSE
+/Content/Carla/pax_global_header
 Config/CarlaSettings.ini
 Config/DefaultEditor.ini
 Config/CarSimConfig.ini
