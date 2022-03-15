@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OpenSCENARIO>
- <FileHeader revMajor="1" revMinor="0" date="2022-03-09T16:48:41.981094" description="CARLA:Converted from UI" author="Rares Bucur"/>
+ <FileHeader revMajor="1" revMinor="0" date="2022-03-11T19:03:18" description="CARLA:Converted from UI" author="Rares Bucur"/>
+ <ParameterDeclarations>
+  <ParameterDeclaration name="leadingSpeed" parameterType="double" value="2.0"/>
  <ParameterDeclarations/>
+ <CatalogLocations/>
  <RoadNetwork>
   <LogicFile filepath="Town01"/>
-  <SceneGraphFile filepath=""/>
+  <SceneGraphFile filepath=/>
  </RoadNetwork>
  <Entities>
-  <ScenarioObject name="vehicle">
+  <ScenarioObject name="hero">
    <Vehicle name="vehicle.tesla.model3" vehicleCategory="car">
     <ParameterDeclarations/>
     <Performance maxSpeed="69.444" maxAcceleration="200" maxDeceleration="10.0"/>
@@ -21,6 +24,7 @@
     </Axles>
     <Properties>
      <Property name="type" value="simulation"/>
+     <Property name="color" value="255,0,0"/>
     </Properties>
    </Vehicle>
   </ScenarioObject>
@@ -28,29 +32,65 @@
  <Storyboard>
   <Init>
    <Actions>
-    <Private entityRef="1">
+    <GlobalAction>
+     <EnvironmentAction>
+      <Environment name="Environment1">
+       <TimeOfDay animation="false" dateTime="2022-03-11T19:03:18"/>
+       <Weather cloudState="free">
+        <Sun intensity="0.85" azimuth="0" elevation="1.31"/>
+        <Fog visualRange="100000.0"/>
+        <Precipitation precipitationType="dry" intensity="0.0"/>
+       </Weather>
+       <RoadCondition frictionScaleFactor="1.0"/>
+      </Environment>
+     </EnvironmentAction>
+    </GlobalAction>
+    <Private entityRef="hero">
      <PrivateAction>
       <TeleportAction>
        <Position>
-        <WorldPosition x="-711.672241" y="299.979279" z="194.178192" h="0"/>
+        <WorldPosition x="21422.855469" y="17509.128906" z="13358.00293" h="0"/>
        </Position>
       </TeleportAction>
      </PrivateAction>
     </Private>
    </Actions>
   </Init>
-  <Story name="MainStory">
-   <Act name ="MainAct">
+  <Story name="FollowingRoute">
+   <Act name ="Act1">
     <ManeuverGroup name="Group1" maximumExecutionCount="1">
      <Actors selectTriggeringEntities="false">
-      <EntityRef entityRef="1"/>
+      <EntityRef entityRef="hero"/>
      </Actors>
+     <Maneuver name="FollowWaypoints">
+      <Event name="Route" priority="overwrite">
+       <Action name ="Assign Route">
+        <PrivateAction>
+         <RoutingAction>
+          <AssignRouteAction>
+           <Route name="Route 1" closed = "false">
+           </Route>
+          </AssignRouteAction>
+         </RoutingAction>
+        </PrivateAction>
+       </Action>
+       <StartTrigger>
+        <ConditionGroup>
+         <Condition name="" delay="0" conditionEdge="rising">
+          <ByValueCondition>
+           <SimulationTimeCondition value="0" rule="greaterThan"/>
+          </ByValueCondition>
+         </Condition>
+        </ConditionGroup>
+       </StartTrigger>
+      </Event>
+     </Maneuver>
     </ManeuverGroup>
     <StartTrigger>
      <ConditionGroup>
-      <Condition name="" delay="0" conditionEdge="rising">
+      <Condition name="StartCondition" delay="0" conditionEdge="rising">
        <ByValueCondition>
-        <SimulationTimeCondition value="0" rule="greaterThan"/>
+        <SimulationTimeCondition rule="greaterThan" value="0.0"/>
        </ByValueCondition>
       </Condition>
      </ConditionGroup>

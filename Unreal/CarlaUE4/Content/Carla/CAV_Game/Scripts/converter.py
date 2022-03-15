@@ -21,10 +21,14 @@ def writeTopLines(openscenario_file):
     with open(openscenario_file, 'w') as f:
         f.write("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
         f.write("<OpenSCENARIO>\n")
-        f.write(" <FileHeader revMajor=\"1\" revMinor=\"0\" date=\"" + str(datetime.now()) + "\" description=\"CARLA:Converted from UI\" author=\"Rares Bucur\"/>\n")
+        f.write("  <FileHeader revMajor=\"1\" revMinor=\"0\" date=\"" + datetime.now().strftime("%Y-%m-%dT%H:%M:%S") + "\" description=\"CARLA:Converted from UI\" author=\"Rares Bucur\"/>\n")
+        f.write(" <ParameterDeclarations>\n")
+        f.write("  <ParameterDeclaration name=\"leadingSpeed\" parameterType=\"double\" value=\"2.0\"/>\n")
         f.write(" <ParameterDeclarations/>\n")
+        f.write(" <CatalogLocations/>\n")
         f.write(" <RoadNetwork>\n")
         f.write("  <LogicFile filepath=\"Town01\"/>\n")
+        f.write("  <SceneGraphFile filepath=""/>\n")
         f.write(" </RoadNetwork>\n")
         f.close()
 
@@ -32,7 +36,7 @@ def writeTopLines(openscenario_file):
 def writeEntities(openscenario_file):
     with open(openscenario_file, 'a') as f:
         f.write(" <Entities>\n")
-        f.write("  <ScenarioObject name=\"vehicle\">\n")
+        f.write("  <ScenarioObject name=\"hero\">\n")
         f.write("   <Vehicle name=\"vehicle.tesla.model3\" vehicleCategory=\"car\">\n")
         f.write("    <ParameterDeclarations/>\n")
         f.write("    <Performance maxSpeed=\"69.444\" maxAcceleration=\"200\" maxDeceleration=\"10.0\"/>\n")
@@ -46,6 +50,7 @@ def writeEntities(openscenario_file):
         f.write("    </Axles>\n")
         f.write("    <Properties>\n")
         f.write("     <Property name=\"type\" value=\"simulation\"/>\n")
+        f.write("     <Property name=\"color\" value=\"255,0,0\"/>\n")
         f.write("    </Properties>\n")
         f.write("   </Vehicle>\n")
         f.write("  </ScenarioObject>\n")
@@ -53,12 +58,30 @@ def writeEntities(openscenario_file):
         f.close()
 
 
-def writeInitActions(openscenario_file, x, y, z):
+def writeInitActions(openscenario_file):
     with open(openscenario_file, 'a') as f:
         f.write(" <Storyboard>\n")
         f.write("  <Init>\n")
         f.write("   <Actions>\n")
-        f.write("    <Private entityRef=\"" + str(1) + "\">\n")
+        f.write("    <GlobalAction>\n")
+        f.write("     <EnvironmentAction>\n")
+        f.write("      <Environment name=\"Environment1\">\n")
+        f.write("       <TimeOfDay animation=\"false\" dateTime=\"" + datetime.now().strftime("%Y-%m-%dT%H:%M:%S") + "\"/>\n")
+        f.write("       <Weather cloudState=\"free\">\n")
+        f.write("        <Sun intensity=\"0.85\" azimuth=\"0\" elevation=\"1.31\"/>\n")
+        f.write("        <Fog visualRange=\"100000.0\"/>\n")
+        f.write("        <Precipitation precipitationType=\"dry\" intensity=\"0.0\"/>\n")
+        f.write("       </Weather>\n")
+        f.write("       <RoadCondition frictionScaleFactor=\"1.0\"/>\n")
+        f.write("      </Environment>\n")
+        f.write("     </EnvironmentAction>\n")
+        f.write("    </GlobalAction>\n")
+        f.close()
+
+
+def initVehicles(openscenario_file, x, y, z):
+    with open(openscenario_file, 'a') as f:
+        f.write("    <Private entityRef=\"hero\">\n")
         f.write("     <PrivateAction>\n")
         f.write("      <TeleportAction>\n")
         f.write("       <Position>\n")
@@ -67,6 +90,11 @@ def writeInitActions(openscenario_file, x, y, z):
         f.write("      </TeleportAction>\n")
         f.write("     </PrivateAction>\n")
         f.write("    </Private>\n")
+        f.close()
+
+
+def closeInitActions(openscenario_file):
+    with open(openscenario_file, 'a') as f:
         f.write("   </Actions>\n")
         f.write("  </Init>\n")
         f.close()
@@ -74,22 +102,67 @@ def writeInitActions(openscenario_file, x, y, z):
 
 def writeStory(openscenario_file):
     with open(openscenario_file, 'a') as f:
-        f.write("  <Story name=\"MainStory\">\n")
-        f.write("   <Act name =\"MainAct\">\n")
-        f.write("    <ManeuverGroup name=\"Group" + str(1) +"\" maximumExecutionCount=\"1\">\n")
+        f.write("  <Story name=\"FollowingRoute\">\n")
+        f.write("   <Act name =\"Act1\">\n")
+        f.write("    <ManeuverGroup name=\"Group1\" maximumExecutionCount=\"1\">\n")
         f.write("     <Actors selectTriggeringEntities=\"false\">\n")
-        f.write("      <EntityRef entityRef=\"" + str(1) + "\"/>\n")
+        f.write("      <EntityRef entityRef=\"hero\"/>\n")
         f.write("     </Actors>\n")
-        # f.write("     <Maneuver name=\"Spawn\">\n")
-        # f.write()
-
+        # f.write("     <Maneuver name=\"Standing\">\n")
+        # f.write("      <ParameterDeclaration name=\"RunScenario\" parameterType=\"boolean\" value=\"false\"/>\n")
+        # f.write("      <Event name=\"VehicleAwaits\" priority=\"overwrite\">\n")
+        # f.write("       <Action name=\"VehicleWaits\">\n")
+        # f.write("        <PrivateAction>\n")
+        # f.write("         <LongitudinalAction>\n")
+        # f.write("          <SpeedAction>\n")
+        # f.write("           <SpeedActionDynamics dynamicsShape=\"step\" value=\"10\" dynamicsDimension=\"time\"/>\n")
+        # f.write("           <SpeedActionTarget>\n")
+        # f.write("            <AbsoluteTargetSpeed value=\"0.0\"/>\n")
+        # f.write("           </SpeedActionTarget>\n")
+        # f.write("          </SpeedAction>\n")
+        # f.write("         </LongitudinalAction>\n")
+        # f.write("        </PrivateAction>\n")
+        # f.write("       </Action>\n")
+        # f.write("       <StartTrigger>\n")
+        # f.write("        <ConditionGroup>\n")
+        # f.write("         <Condition name=\"StartCondition\" delay=\"0\" conditionEdge=\"rising\">\n")
+        # f.write("          <ByValueCondition>\n")
+        # f.write("           <ParameterCondition parameterRef=\"RunScenario\" value=\"false\" rule=\"equalTo\"/>\n")
+        # f.write("          </ByValueCondition>\n")
+        # f.write("         </Condition>\n")
+        # f.write("        </ConditionGroup>\n")
+        # f.write("       </StartTrigger>\n")
+        # f.write("      </Event>\n")
         # f.write("     </Maneuver>\n")
+        f.write("     <Maneuver name=\"FollowWaypoints\">\n")
+        f.write("      <Event name=\"Route\" priority=\"overwrite\">\n")
+        f.write("       <Action name =\"Assign Route\">\n")
+        f.write("        <PrivateAction>\n")
+        f.write("         <RoutingAction>\n")
+        f.write("          <AssignRouteAction>\n")
+        f.write("           <Route name=\"Route 1\" closed = \"false\">\n")
+        f.write("           </Route>\n")
+        f.write("          </AssignRouteAction>\n")
+        f.write("         </RoutingAction>\n")
+        f.write("        </PrivateAction>\n")
+        f.write("       </Action>\n")
+        f.write("       <StartTrigger>\n")
+        f.write("        <ConditionGroup>\n")
+        f.write("         <Condition name=\"\" delay=\"0\" conditionEdge=\"rising\">\n")
+        f.write("          <ByValueCondition>\n")
+        f.write("           <SimulationTimeCondition value=\"0\" rule=\"greaterThan\"/>\n")
+        f.write("          </ByValueCondition>\n")
+        f.write("         </Condition>\n")
+        f.write("        </ConditionGroup>\n")
+        f.write("       </StartTrigger>\n")
+        f.write("      </Event>\n")
+        f.write("     </Maneuver>\n")
         f.write("    </ManeuverGroup>\n")
         f.write("    <StartTrigger>\n")
         f.write("     <ConditionGroup>\n")
-        f.write("      <Condition name=\"\" delay=\"0\" conditionEdge=\"rising\">\n")
+        f.write("      <Condition name=\"StartCondition\" delay=\"0\" conditionEdge=\"rising\">\n")
         f.write("       <ByValueCondition>\n")
-        f.write("        <SimulationTimeCondition value=\"0\" rule=\"greaterThan\"/>\n")
+        f.write("        <SimulationTimeCondition rule=\"greaterThan\" value=\"0.0\"/>\n")
         f.write("       </ByValueCondition>\n")
         f.write("      </Condition>\n")
         f.write("     </ConditionGroup>\n")
@@ -109,18 +182,12 @@ def writeStory(openscenario_file):
         f.write("</OpenSCENARIO>\n")
 
 
-# def classifyAgent(openscenario_file):
-#     with open(openscenario_file, 'a') as f:
-#         f.write("...\n")
-#         f.write()
-#         f.write()
-#         f.write()
-#         f.close()
-
 
 writeTopLines(openscenario_file)
 writeEntities(openscenario_file)
-writeInitActions(openscenario_file, x, y, z)
+writeInitActions(openscenario_file)
+initVehicles(openscenario_file, x, y, z)
+closeInitActions(openscenario_file)
 writeStory(openscenario_file)
 
 
