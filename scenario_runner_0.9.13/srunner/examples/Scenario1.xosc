@@ -1,110 +1,89 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OpenSCENARIO>
- <FileHeader revMajor="1" revMinor="0" date="2022-03-11T19:03:18" description="CARLA:Converted from UI" author="Rares Bucur"/>
- <ParameterDeclarations>
-  <ParameterDeclaration name="leadingSpeed" parameterType="double" value="2.0"/>
- <ParameterDeclarations/>
- <CatalogLocations/>
- <RoadNetwork>
-  <LogicFile filepath="Town01"/>
-  <SceneGraphFile filepath=/>
- </RoadNetwork>
- <Entities>
-  <ScenarioObject name="hero">
-   <Vehicle name="vehicle.tesla.model3" vehicleCategory="car">
-    <ParameterDeclarations/>
-    <Performance maxSpeed="69.444" maxAcceleration="200" maxDeceleration="10.0"/>
-    <BoundingBox>
-     <Center x="1.5" y="0.0" z="0.9"/>
-     <Dimensions width= "2.1" length= "4.5" height="1.8"/>
-    </BoundingBox>
-    <Axles>
-     <FrontAxle maxSteering="0.5" wheelDiameter="0.6" trackWidth="1.8" positionX="3.1" positionZ="0.3"/>
-     <RearAxle maxSteering="0.0" wheelDiameter="0.6" trackWidth="1.8" positionX="0.0" positionZ="0.3"/>
-    </Axles>
-    <Properties>
-     <Property name="type" value="simulation"/>
-     <Property name="color" value="255,0,0"/>
-    </Properties>
-   </Vehicle>
-  </ScenarioObject>
- </Entities>
- <Storyboard>
-  <Init>
-   <Actions>
-    <GlobalAction>
-     <EnvironmentAction>
-      <Environment name="Environment1">
-       <TimeOfDay animation="false" dateTime="2022-03-11T19:03:18"/>
-       <Weather cloudState="free">
-        <Sun intensity="0.85" azimuth="0" elevation="1.31"/>
-        <Fog visualRange="100000.0"/>
-        <Precipitation precipitationType="dry" intensity="0.0"/>
-       </Weather>
-       <RoadCondition frictionScaleFactor="1.0"/>
-      </Environment>
-     </EnvironmentAction>
-    </GlobalAction>
-    <Private entityRef="hero">
-     <PrivateAction>
-      <TeleportAction>
-       <Position>
-        <WorldPosition x="21422.855469" y="17509.128906" z="13358.00293" h="0"/>
-       </Position>
-      </TeleportAction>
-     </PrivateAction>
-    </Private>
-   </Actions>
-  </Init>
-  <Story name="FollowingRoute">
-   <Act name ="Act1">
-    <ManeuverGroup name="Group1" maximumExecutionCount="1">
-     <Actors selectTriggeringEntities="false">
-      <EntityRef entityRef="hero"/>
-     </Actors>
-     <Maneuver name="FollowWaypoints">
-      <Event name="Route" priority="overwrite">
-       <Action name ="Assign Route">
-        <PrivateAction>
-         <RoutingAction>
-          <AssignRouteAction>
-           <Route name="Route 1" closed = "false">
-           </Route>
-          </AssignRouteAction>
-         </RoutingAction>
-        </PrivateAction>
-       </Action>
-       <StartTrigger>
-        <ConditionGroup>
-         <Condition name="" delay="0" conditionEdge="rising">
+  <FileHeader revMajor="1" revMinor="0" date="2022-05-04T21:00:24" description="CARLA:Converted from UI" author="Rares Bucur"/>
+  <ParameterDeclarations>
+    <ParameterDeclaration name="leadingSpeed" parameterType="double" value="8.0"/>
+  </ParameterDeclarations>
+  <CatalogLocations/>
+  <RoadNetwork>
+    <LogicFile filepath="Town01"/>
+    <SceneGraphFile filepath=""/>
+  </RoadNetwork>
+  <Entities>
+    <ScenarioObject name="vehicle">
+      <Vehicle name="vehicle.tesla.model3" vehicleCategory="car">
+        <ParameterDeclarations/>
+        <Performance maxSpeed="69.444" maxAcceleration="200" maxDeceleration="10.0"/>
+        <BoundingBox>
+          <Center x="1.5" y="0.0" z="0.9"/>
+          <Dimensions width= "2.1" length= "4.5" height="1.8"/>
+        </BoundingBox>
+        <Axles>
+          <FrontAxle maxSteering="0.5" wheelDiameter="0.6" trackWidth="1.8" positionX="3.1" positionZ="0.3"/>
+          <RearAxle maxSteering="0.0" wheelDiameter="0.6" trackWidth="1.8" positionX="0.0" positionZ="0.3"/>
+        </Axles>
+        <Properties>
+          <Property name="type" value="simulation"/>
+          <Property name="color" value="255,0,0"/>
+        </Properties>
+      </Vehicle>
+    </ScenarioObject>
+  </Entities>
+  <Storyboard>
+    <Init>
+      <Actions>
+        <Private entityRef="vehicle">
+          <PrivateAction>
+            <TeleportAction>
+              <Position>
+                <WorldPosition x="318.163452" y="129.677185" z="-0.0"/>
+              </Position>
+            </TeleportAction>
+          </PrivateAction>
+        </Private>
+      </Actions>
+    </Init>
+    <Story name="Scenario">
+      <Act name ="Behaviour">
+        <ManeuverGroup name="ManeuverSequence" maximumExecutionCount="1">
+          <Actors selectTriggeringEntities="false">
+            <EntityRef entityRef="vehicle"/>
+          </Actors>
+          <Maneuver name="VehicleManeuver">
+            <Event name="VehicleFollowingWaypoints" priority="overwrite">
+              <Action name="VehicleFollowingWaypoints">
+              </Action>
+              <StartTrigger>
+                <ConditionGroup>
+                  <Condition name="EndSim" delay="0" conditionEdge="rising">
+                    <ByValueCondition>
+                      <SimulationTimeCondition value="5" rule="greaterThan"/>
+                    </ByValueCondition>
+                  </Condition>
+                </ConditionGroup>
+              </StartTrigger>
+            </Event>
+          </Maneuver>
+        </ManeuverGroup>
+        <StartTrigger>
+          <ConditionGroup>
+            <Condition name="EndSim" delay="0" conditionEdge="rising">
+              <ByValueCondition>
+                <SimulationTimeCondition value="0" rule="greaterThan"/>
+              </ByValueCondition>
+            </Condition>
+          </ConditionGroup>
+        </StartTrigger>
+      </Act>
+    </Story>
+    <StopTrigger>
+      <ConditionGroup>
+        <Condition name="EndSim" delay="0" conditionEdge="rising">
           <ByValueCondition>
-           <SimulationTimeCondition value="0" rule="greaterThan"/>
+            <SimulationTimeCondition value="30" rule="greaterThan"/>
           </ByValueCondition>
-         </Condition>
-        </ConditionGroup>
-       </StartTrigger>
-      </Event>
-     </Maneuver>
-    </ManeuverGroup>
-    <StartTrigger>
-     <ConditionGroup>
-      <Condition name="StartCondition" delay="0" conditionEdge="rising">
-       <ByValueCondition>
-        <SimulationTimeCondition rule="greaterThan" value="0.0"/>
-       </ByValueCondition>
-      </Condition>
-     </ConditionGroup>
-    </StartTrigger>
-   </Act>
-  </Story>
-  <StopTrigger>
-   <ConditionGroup>
-    <Condition name="" delay="0" conditionEdge="rising">
-     <ByValueCondition>
-      <SimulationTimeCondition value="30" rule="greaterThan"/>
-     </ByValueCondition>
-    </Condition>
-   </ConditionGroup>
-  </StopTrigger>
- </Storyboard>
+        </Condition>
+      </ConditionGroup>
+    </StopTrigger>
+  </Storyboard>
 </OpenSCENARIO>
