@@ -1,0 +1,21 @@
+LMB for 
+      - selecting existing vehicles
+      - selecting existing waypoints
+      - creating new waypoints for selected vehicle
+
+RMB for 
+       - spawning a new vehicle
+
+
+- Continue tutorial on holding object from where the mouse grabs it: https://www.youtube.com/watch?v=XVND_jo-kNo
+
+- Movment should follow cursor ray 
+
+- See how you can set the colour of the material as this is doesn't want to work.
+
+- AVoid spawning actors on top of each other.
+
+- Create waypoints.``
+
+
+
