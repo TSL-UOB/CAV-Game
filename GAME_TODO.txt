@@ -11,7 +11,7 @@ RMB for
 
 - Movment should follow cursor ray 
 
-- See how you can set the colour of the material as this is doesn't want to work.
+- Create new ghost material and use it to set it to vehicles.
 
 - AVoid spawning actors on top of each other.
 
