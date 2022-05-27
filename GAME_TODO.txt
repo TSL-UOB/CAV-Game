@@ -11,11 +11,19 @@ RMB for
 
 - Movment should follow cursor ray 
 
-- Create new ghost material and use it to set it to vehicles.
-
 - AVoid spawning actors on top of each other.
 
-- Create waypoints.``
+
+
+- Set reset scenario to delete everything
+
+- Set the when execute scenario to delete everything and run openscneario
+
+- Set atfter OpenScenario is run to put back the actors and waypoints as they were.
+
+- logging 
+
+- convert log to openScenario file
 
 
 
