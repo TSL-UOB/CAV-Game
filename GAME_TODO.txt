@@ -13,17 +13,12 @@ RMB for
 
 - AVoid spawning actors on top of each other.
 
+- When execute Scenario button is pressed 
+    -  generate log and (DONE) 
+    - convert to OpenScneario file and (giving me error of command not recognised) 
+    - execute OpenScenario file.
 
+- When terminate button is pressed kill OpenScenario execution.
 
-- Set reset scenario to delete everything
-
-- Set the when execute scenario to delete everything and run openscneario
-
-- Set atfter OpenScenario is run to put back the actors and waypoints as they were.
-
-- logging 
-
-- convert log to openScenario file
-
-
+- When OpenSCneario finishes execution set the terminate flag to true to put back everything as it was.
 
