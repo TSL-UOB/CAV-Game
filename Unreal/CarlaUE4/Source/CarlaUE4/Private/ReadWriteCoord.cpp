@@ -26,3 +26,23 @@ bool UReadWriteCoord::SaveArrayText(FString SaveDirectory, FString FileName, TAr
 
 	return FFileHelper::SaveStringToFile(FinalString, *SaveDirectory);
 }
+
+bool UReadWriteCoord::SaveText(FString SaveDirectory, FString FileName, FString SaveText, bool AllowOverwriting = true) {
+
+	// Set complete path
+	SaveDirectory += "\\";
+	SaveDirectory += FileName;
+
+	if (AllowOverwriting) {
+		if (FPlatformFileManager::Get().GetPlatformFile().FileExists(*SaveDirectory)) {
+
+			return false;
+		}
+	}
+
+	FString FinalString = "";
+	FinalString += SaveText;
+	// FinalString += LINE_TERMINATOR;
+
+	return FFileHelper::SaveStringToFile(FinalString, *SaveDirectory);
+}

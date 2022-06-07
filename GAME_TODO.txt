@@ -22,3 +22,19 @@ RMB for
 
 - When OpenSCneario finishes execution set the terminate flag to true to put back everything as it was.
 
+
+- STOPPED at trying another OpenScenario file, and terminating it more quickly than this. Trying to make the UE4 controls only apply to vehicles that are only ghosts.
+
+look at this link below and go through the imports
+https://discourse.techart.online/t/including-local-python-libraries-in-unreal-python/11732
+
+https://docs.unrealengine.com/5.0/en-US/scripting-the-unreal-editor-using-python/
+
+
+
+
+ISSUES I FACED:
+- The back slahes in the following file "/home/abanoub_g/UnrealEngine_4.26/Engine/Binaries/ThirdParty/Python3/Linux/lib/python3.7/site-packages/pkg_resources/_vendor/pyparsing.py", were causing errors for importing pkg_resources. Solution: Went through file and removed new lines after backslashes or removed back slash and made code one line.
+
+- Cannot import numpy and getting a lot of issues with exeuting scenario runner through.  I tried to put numpy as a library in under Content/Python and that didn't work. I also tried to change the directory path so unreal uses the local python directory of the machine by adding this export UE_PYTHON_DIR=/usr/bin/python3 envrionment variable to .bashrc and that didn't change the path of the python being used by UE4. Solution: for now execute Python script independntly that monitors if a variable changes in a txt file. I fit does then it excutes scenario runner. If it changes then it kills scenario runner. This script would need to be run indepnetly of the game for now.
+

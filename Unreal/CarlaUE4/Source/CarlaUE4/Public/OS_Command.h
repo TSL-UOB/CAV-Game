@@ -15,6 +15,6 @@ class CARLAUE4_API UOS_Command : public UBlueprintFunctionLibrary
 	GENERATED_BODY()
 
 		UFUNCTION(BlueprintCallable, Category = "Custom", meta = (Keywords = "Execute"))
-		static void ExecuteCommand();
+		static void ExecuteCustomOS_TerminalCommand(FString PathToPythonScript);
 	
 };
