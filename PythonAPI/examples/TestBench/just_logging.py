@@ -184,7 +184,7 @@ try:
 	logging_time_increment = 0.1
 
 	# setting time threshold for logging script to stop
-	script_timeout_thresh = 15
+	script_timeout_thresh = 40
 
 	# initialise logging class
 	tests_logs = log(logging_time_increment) 
@@ -203,27 +203,11 @@ try:
 		agents_list = []
 
 		# filter the vehicles from actors and use extract their info to append to the agents list
-		for vehicle in all_actors.filter('vehicle.tesla.model3'):
+		for vehicle in all_actors.filter('vehicle.mercedes-benz.coupe'):
 			print(vehicle)
 			agentID          = vehicle.id
 			agentType        = vehicle.type_id
-			agentNo          = 1
-			agentTypeNo      = 3 
-			current_x        = vehicle.get_transform().location.x
-			current_y        = vehicle.get_transform().location.y
-			current_z        = vehicle.get_transform().location.z
-			current_yaw      = wraptopi(math.radians(vehicle.get_transform().rotation.yaw))
-			agent_velocity   = vehicle.get_velocity() 
-			current_velocity = np.array([agent_velocity.x, agent_velocity.y, agent_velocity.z])
-			current_speed    = np.sqrt(current_velocity.dot(current_velocity))
-
-			agents_list.append(agent(agentID,agentType,agentNo,agentTypeNo,current_x,current_y,current_z,current_yaw,current_velocity,current_speed))
-
-		for vehicle in all_actors.filter('vehicle.lincoln.mkz_2017'):
-			print(vehicle)
-			agentID          = vehicle.id
-			agentType        = vehicle.type_id
-			agentNo          = 2
+			agentNo          = vehicle.id
 			agentTypeNo      = 3 
 			current_x        = vehicle.get_transform().location.x
 			current_y        = vehicle.get_transform().location.y
@@ -275,4 +259,5 @@ try:
 
 finally:
 	# Save file: change name for new files or old files will be overwritten 
-	tests_logs.write_file("RecreatedRun50.csv")
+	tests_logs.write_file("RecreatedRun.txt")
+	

@@ -23,7 +23,16 @@ RMB for
 - When OpenSCneario finishes execution set the terminate flag to true to put back everything as it was.
 
 
-- STOPPED at trying another OpenScenario file, and terminating it more quickly than this. Trying to make the UE4 controls only apply to vehicles that are only ghosts.
+- STOPPED at:
+  - create a timeout or if all actors are stationary for a certain amount of time terminate scenario
+  - Saving the last executed Scenario
+  - Rerunning a selected Scenario file.
+  - Creating the scroing function.
+  - Creating the AV.
+  - Stop AV from flying when hit by another vehicle actor during scenairo planning.
+  - Trying AV spawn and die and be removed depending on the use of buttons.
+
+  
 
 look at this link below and go through the imports
 https://discourse.techart.online/t/including-local-python-libraries-in-unreal-python/11732
