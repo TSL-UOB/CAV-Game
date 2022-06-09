@@ -21,15 +21,22 @@ class AV_on_Stright_Road():
 
 		self.AV = autonomous_vehicle()
 
-		x = 119.46
-		y = 129.75
-		z = 0.30
-		yaw = 0
+		x_spawn = 119.46
+		y_spawn = 129.75
+		z_spawn = 0.30
+		yaw_spawn = 0
 
 		self.AV.spawn(x,y,z,yaw)
 
 
-	# def set(self): 
+
+	def set(self):
+		x_dest = 176.58
+		y_dest = 129.74
+		z_dest = 0.30 
+		self.AV.set_destination(x_dest,y_dest,z_dest) 
+		self.AV.vehicle_speed = 5
+
 	# 	self.actors_list = []
 	# 	self.veh1 = vehicle(1)
 	# 	self.veh2 = vehicle(2)
@@ -84,8 +91,9 @@ class AV_on_Stright_Road():
 		# self.veh3_speed = 5
 
 
-	# def step(self):
-	# 	self.veh1.step() 
+	def step(self):
+		self.AV.step() 
+
 	# 	self.veh2.step() 
 	# 	self.veh3.step()
 

@@ -48,6 +48,8 @@ def interpolate_path(path_tuple, increments_resolution):
 
 class autonomous_vehicle():
 	def __init__(self):
+		self.execute_trigger_file = "TriggerScenarioExecution.csv"
+
 		self.client = client
 		self.world  = world
 
@@ -108,8 +110,23 @@ class autonomous_vehicle():
 		print("Vehicle destination set!")
 		
 	def step(self):
-		self.world_snapshot = self.world.get_snapshot()
+		# Check if exection trigger is on
+		with open(self.execute_trigger_file, 'r') as f:
+			lines = csv.reader(f, delimiter=',', quotechar='|')
+			rows = list(lines)
 
+		try:
+			MoveToDestination = rows[0][0]
+		except:
+			MoveToDestination = "False"
+
+		if MoveToDestination == "True":
+			self.stop = True
+		else:
+			self.stop = False
+
+		# Get update of the world state
+		self.world_snapshot = self.world.get_snapshot()
 		self.Update_state_info()
 
 		if self.stop == True:
@@ -119,7 +136,6 @@ class autonomous_vehicle():
 			self.get_to_destination()	
 			# self.controller()
 		
-		pass
 
 	def set_speed(self,speed):
 		self.vehicle_speed = speed
@@ -229,20 +245,20 @@ class autonomous_vehicle():
 		
 		area = 20.0
 
-		# print("path = ",self.path)
-		plt.cla()
-		# for stopping simulation with the esc key.
-		plt.gcf().canvas.mpl_connect('key_release_event',lambda event: [exit(0) if event.key == 'escape' else None])
-		plt.plot(self.tx, self.ty)
-		if ob.size:
-			plt.plot(ob[:, 0], ob[:, 1], "xk")
-		plt.plot(self.path.x[1:], self.path.y[1:], "-or")
-		plt.plot(self.path.x[1], self.path.y[1], "vc")
-		plt.xlim(self.path.x[1] - area, self.path.x[1] + area)
-		plt.ylim(self.path.y[1] - area, self.path.y[1] + area)
-		plt.title("v[km/h]:" + str(c_speed * 3.6)[0:4])
-		plt.grid(True)
-		plt.pause(0.0001)
+		# # print("path = ",self.path)
+		# plt.cla()
+		# # for stopping simulation with the esc key.
+		# plt.gcf().canvas.mpl_connect('key_release_event',lambda event: [exit(0) if event.key == 'escape' else None])
+		# plt.plot(self.tx, self.ty)
+		# if ob.size:
+		# 	plt.plot(ob[:, 0], ob[:, 1], "xk")
+		# plt.plot(self.path.x[1:], self.path.y[1:], "-or")
+		# plt.plot(self.path.x[1], self.path.y[1], "vc")
+		# plt.xlim(self.path.x[1] - area, self.path.x[1] + area)
+		# plt.ylim(self.path.y[1] - area, self.path.y[1] + area)
+		# plt.title("v[km/h]:" + str(c_speed * 3.6)[0:4])
+		# plt.grid(True)
+		# plt.pause(0.0001)
 
 		# conrtoller step
 		throttle, brake, steer = self.controller.step(self.path, self.current_x, self.current_y, self.current_yaw, self.current_speed)
@@ -257,41 +273,43 @@ class autonomous_vehicle():
 	def PathPlan(self):
 		spawn_pos = [self.spawn_point_x,self.spawn_point_y]
 		destination_pos = [self.dest_x,self.dest_y] 
-		want_to_plot_path = False
-		want_to_plot = False
-		plot_every       = 10
+		# want_to_plot_path = False
+		# want_to_plot = False
+		# plot_every       = 10
 		
-		xStart = spawn_pos_idx = find_nearest(self.map_x_coord, spawn_pos[0])[0][0]
-		yStart = spawn_pos_idy = find_nearest(self.map_y_coord, spawn_pos[1])[0][1]
+		# xStart = spawn_pos_idx = find_nearest(self.map_x_coord, spawn_pos[0])[0][0]
+		# yStart = spawn_pos_idy = find_nearest(self.map_y_coord, spawn_pos[1])[0][1]
 
-		xEnd = destination_pos_idx = find_nearest(self.map_x_coord, destination_pos[0])[0][0]
-		yEnd = destination_pos_idy =find_nearest(self.map_y_coord, destination_pos[1])[0][1]
+		# xEnd = destination_pos_idx = find_nearest(self.map_x_coord, destination_pos[0])[0][0]
+		# yEnd = destination_pos_idy =find_nearest(self.map_y_coord, destination_pos[1])[0][1]
 
-		start = (xStart, yStart)
-		end = (xEnd, yEnd)
-		cost = 1 # cost per movement
+		# start = (xStart, yStart)
+		# end = (xEnd, yEnd)
+		# cost = 1 # cost per movement
 
-		# Plot_map(AV_pos, Target_pos, map_objects, map_x_coord, map_y_coord)
+		# # Plot_map(AV_pos, Target_pos, map_objects, map_x_coord, map_y_coord)
 
-		path, path_mat = astar_search(start, end, cost, spawn_pos, destination_pos, self.occupancy_grid, self.map_x_coord, self.map_y_coord, want_to_plot,plot_every)
+		# path, path_mat = astar_search(start, end, cost, spawn_pos, destination_pos, self.occupancy_grid, self.map_x_coord, self.map_y_coord, want_to_plot,plot_every)
 
-		path_coord = []
-		for i in range(len(path)):
-			coord_tuple = (self.map_x_coord[path[i]],self.map_y_coord[path[i]])
-			path_coord.append(coord_tuple)
-		self.main_path = path_coord
-		self.path_shapely_line = LineString(self.main_path)
-		print(self.path_shapely_line)
+		# path_coord = []
+		# for i in range(len(path)):
+		# 	coord_tuple = (self.map_x_coord[path[i]],self.map_y_coord[path[i]])
+		# 	path_coord.append(coord_tuple)
+		# self.main_path = path_coord
+		# self.path_shapely_line = LineString(self.main_path)
+		# print(self.path_shapely_line)
 
 		# wx = [x[0] for x in path_coord]
 		# wy = [x[1] for x in path_coord]
+
+		TODO Interpolate here to create path of wx and wy
 		wx = [self.spawn_point_x, 29.4, 41.5]
 		wy = [self.spawn_point_y, -41.2,-47.4]
 
 		self.tx, self.ty, self.tyaw, self.tc, self.csp = generate_target_course(wx, wy)
 
-		if want_to_plot_path:
-			self.Plot_path(spawn_pos, destination_pos, self.occupancy_grid, self.map_x_coord, self.map_y_coord, path_coord)
+		# if want_to_plot_path:
+		# 	self.Plot_path(spawn_pos, destination_pos, self.occupancy_grid, self.map_x_coord, self.map_y_coord, path_coord)
 
 	def send_control(self, throttle, steer, brake, hand_brake=False, reverse=False):
 		self.control = carla.VehicleControl()

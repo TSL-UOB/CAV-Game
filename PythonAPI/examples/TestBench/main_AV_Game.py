@@ -42,10 +42,12 @@ def main():
 
 		frame  = None
 		world.tick()
+		settings.synchronous_mode = False
+		world.apply_settings(settings)
 
 		# Setting up environment
 		env = AV_on_Stright_Road(world)
-		
+
 		# ===Set 
 		# env.set()
 
@@ -88,18 +90,28 @@ def main():
 
 
 
+	except Exception:
+		print("Executed before destroy in exception!!!")
+		env.destroy()
+		print("Executed after destroy in exception!!!")
+
+		settings.synchronous_mode = False
+		world.apply_settings(settings)
+		pass
+
 	finally:
 
 		# env.end_tests()
 		# env.destroy_actors()
+		print("Executed before destroy in finally!!!")
 		env.destroy()
+		print("Executed after destroy in finally!!!")
 
 		settings.synchronous_mode = False
 		world.apply_settings(settings)
 
 
 if __name__ == '__main__':
-
 	try:
 		main()
 	except KeyboardInterrupt:

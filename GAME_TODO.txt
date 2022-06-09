@@ -30,7 +30,9 @@ RMB for
   - Creating the scroing function.
   - Creating the AV.
   - Stop AV from flying when hit by another vehicle actor during scenairo planning.
-  - Trying AV spawn and die and be removed depending on the use of buttons.
+  - Do path planning using interploation
+  - Plot the frenet path of the vehicle in UE4
+  - Only exectute repath planning using frenet if there is an obstacle.
 
   
 
