@@ -16,7 +16,7 @@ class vehicle():
 		self.world  = world
 
 		self.blueprint_library = self.world.get_blueprint_library()
-		self.vehicle_blueprint = self.blueprint_library.filter("vehicle.mercedes-benz.coupe")[0]
+		self.vehicle_blueprint = self.blueprint_library.filter("vehicle.mercedes.coupe")[0]
 		self.vehicle_blueprint.set_attribute('color', AgentColourToRGB("yellow"))
 
 		self.agentNo = agentNo
@@ -32,11 +32,6 @@ class vehicle():
 		self.ignorePath = True
 
 		self.vehicle_speed = 5 # Setting a default speed
-
-		self.path_index = 0
-		self.desired_speed = 0
-		self.longitudinal_error_previous = 0
-		self.previous_t = 0
 
 		self.controller = long_lat_controller()
 

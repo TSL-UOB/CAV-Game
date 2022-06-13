@@ -49,7 +49,7 @@ def main():
 		env = AV_on_Stright_Road(world)
 
 		# ===Set 
-		# env.set()
+		env.set()
 
 		
 #========================================================================================================		
@@ -75,7 +75,7 @@ def main():
 			# print("Ticking")
 
 			# ===Step 
-			# env.step() 
+			env.step() 
 			
 			# if env.test_ended == True:
 			# 	env.destroy()
@@ -90,7 +90,7 @@ def main():
 
 
 
-	except Exception:
+	# except Exception:
 		print("Executed before destroy in exception!!!")
 		env.destroy()
 		print("Executed after destroy in exception!!!")

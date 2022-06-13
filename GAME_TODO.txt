@@ -30,9 +30,10 @@ RMB for
   - Creating the scroing function.
   - Creating the AV.
   - Stop AV from flying when hit by another vehicle actor during scenairo planning.
-  - Do path planning using interploation
-  - Plot the frenet path of the vehicle in UE4
+
+  - Plot the frenet path of the vehicle in UE4...
   - Only exectute repath planning using frenet if there is an obstacle.
+  - Using the static AV path or the frenet controller both result in the AV not bevhaing following path properly. Need to try first to do see if I can let AV follow path like in assertions code then switch to the frenet.
 
   
 

@@ -7,34 +7,76 @@ import numpy as np
 # from shapely.geometry import Polygon
 
 from AVs_internal.CAV_Game_AV import autonomous_vehicle
+from Agents.vehicle import vehicle
 
 # Contains 
 #  Spawn point
 #  Destination
 #  Speed
 #  Paths of lanes AV can use
+def interpolate_path(path_tuple, increments_resolution):
+	
+	path_tuple_interpolated = []
+	
+	path_tuple_interpolated.append(path_tuple[0])
+	
+	for i in range(len(path_tuple)-1):
+		
+		diff = abs(np.subtract(path_tuple[i], path_tuple[i+1]))
+		dist = np.hypot(diff[0],diff[1])
+		
+		if dist > increments_resolution:
+
+			num_points_remainder = dist%increments_resolution
+			num_points = int(np.ceil((dist - num_points_remainder)/increments_resolution)) + 1
+			
+			if num_points_remainder > 0:
+				num_points = num_points + 1 
+				
+			x = np.linspace(path_tuple[i][0], path_tuple[i+1][0], num_points)
+			x = x[1:]
+			x = [round(num, 1) for num in x]
+
+			y = np.linspace(path_tuple[i][1], path_tuple[i+1][1], num_points)
+			y = y[1:]
+			y = [round(num, 1) for num in y]
+
+			interolated_points = list(zip(x, y))
+			path_tuple_interpolated = path_tuple_interpolated + interolated_points
+			# print(path_tuple_interpolated)
+			
+	return(path_tuple_interpolated)
 
 class AV_on_Stright_Road():
 	def __init__(self, world):
 		self.spawn_height = 1
 		self.world = world
 
+
+	def set(self):
 		self.AV = autonomous_vehicle()
+		# self.AV = vehicle(1)
 
 		x_spawn = 119.46
 		y_spawn = 129.75
 		z_spawn = 0.30
 		yaw_spawn = 0
 
-		self.AV.spawn(x,y,z,yaw)
+		# self.AV.spawn(x_spawn,y_spawn,z_spawn,yaw_spawn)
+		self.AV.spawn(x_spawn, y_spawn, z_spawn, yaw_spawn)
 
 
-
-	def set(self):
 		x_dest = 176.58
 		y_dest = 129.74
 		z_dest = 0.30 
-		self.AV.set_destination(x_dest,y_dest,z_dest) 
+		# self.AV.set_destination(x_dest,y_dest,z_dest)
+		# self.AV_path = [(119.46, 129.75), (176.58, 129.74)]
+		# self.AV_path = [(119.46, 129.75), (156.58, 145.74), (176.58, 129.74)]
+		self.AV_path = [(119.46, 129.75), (136.58, 132.74), (155.58, 129.74), (176.58, 129.74)]
+		interpolation_resolution_min = 1
+		self.AV_path_interpolated  = interpolate_path(self.AV_path, interpolation_resolution_min)
+		self.AV.set_path(self.AV_path_interpolated)
+
 		self.AV.vehicle_speed = 5
 
 	# 	self.actors_list = []
