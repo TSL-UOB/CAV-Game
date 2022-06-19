@@ -8,6 +8,8 @@ import math
 import numpy as np
 import matplotlib.pyplot as plt
 
+import csv
+
 import collections
 import weakref
 
@@ -116,12 +118,12 @@ class LaneInvasionSensor(object):
 		if not self:
 			self.invasion_flag = False
 			return
-		print("event.crossed_lane_markings",event.crossed_lane_markings)
+		# print("event.crossed_lane_markings",event.crossed_lane_markings)
 		lane_types = set(x.type for x in event.crossed_lane_markings)
-		print("lane_types",lane_types)
+		# print("lane_types",lane_types)
 		text = ['%r' % str(x).split()[-1] for x in lane_types]
 		# self.hud.notification('Crossed line %s' % ' and '.join(text))
-		print("text = ",text)
+		# print("text = ",text)
 		self.invasion_flag = True
 
 
@@ -132,6 +134,8 @@ class LaneInvasionSensor(object):
 class ObstacleSensor(object):
 	def __init__(self, parent_actor):
 		self.sensor = None
+		self.previous_timestamp = 0
+		self.timestamp = 0
 
 		# If the spawn object is not a vehicle, we cannot use the Lane Invasion Sensor
 		if parent_actor.type_id.startswith("vehicle."):
@@ -139,8 +143,8 @@ class ObstacleSensor(object):
 			world = self._parent.get_world()
 			self.bp = world.get_blueprint_library().find('sensor.other.obstacle')
 			# self.bp.set_attribute('distance','5')
-			# self.bp.set_attribute('hit_radius','5')
-			self.bp.set_attribute('debug_linetrace','true')
+			self.bp.set_attribute('hit_radius','0.75')
+			self.bp.set_attribute('debug_linetrace','false')
 			self.bp.set_attribute('only_dynamics', 'false')
 
 	def spawn(self,x,y,z,yaw):
@@ -155,9 +159,21 @@ class ObstacleSensor(object):
 		self = weak_self()
 		if not self:
 			return
-
+		self.previous_timestamp = self.timestamp
 		self.distance = event.distance
-		print(self.distance)
+		self.timestamp = event.timestamp
+		self.other_actor = event.other_actor
+		self.obstacle_ahead = True
+		# print("event.other_actor = ",event.other_actor)
+		# print("event.other_actor.type_id = ",event.other_actor.type_id)
+		# if self.distance > 0:
+			
+		# else:
+			# self.obstacle_ahead = False
+
+			# print("HERE=======================================")
+			# print(self.distance)
+			# print("HERE=======================================")
 		# self._event_count += 1
 		# print ("Event %s, in line of sight with %s at distance %u" % (self._event_count, event.other_actor.type_id, event.distance))
 
@@ -178,7 +194,7 @@ class ObstacleSensor(object):
 
 class autonomous_vehicle():
 	def __init__(self):
-		self.execute_trigger_file = "TriggerScenarioExecution.csv"
+		self.execute_trigger_file = "../../../Unreal/CarlaUE4/Content/Carla/CAV_Game/Scripts/TriggerScenarioExecution.csv"
 
 		self.client = client
 		self.world  = world
@@ -201,9 +217,38 @@ class autonomous_vehicle():
 		self.controller = long_lat_controller()
 		
 		self.frenet_start_flag = True
+		self.frenet_flag = False
 
 		self.current_collision = None
 		self.last_collision = None
+
+		self.obstacle_sensor_1_previous_timestamp        = 0
+		self.obstacle_sensor_2_previous_timestamp        = 0
+		self.obstacle_sensor_3_previous_timestamp        = 0
+		self.obstacle_sensor_4_previous_timestamp        = 0
+		self.obstacle_sensor_5_previous_timestamp        = 0
+		self.obstacle_sensor_6_previous_timestamp        = 0
+		self.obstacle_sensor_7_previous_timestamp        = 0
+		self.obstacle_sensor_8_previous_timestamp        = 0
+		self.obstacle_sensor_9_previous_timestamp        = 0
+		self.obstacle_sensor_10_previous_timestamp        = 0
+		self.obstacle_sensor_11_previous_timestamp        = 0
+
+		self.obstacle_at_1        = False
+		self.obstacle_at_2        = False
+		self.obstacle_at_3        = False
+		self.obstacle_at_4        = False
+		self.obstacle_at_5        = False
+		self.obstacle_at_6        = False
+		self.obstacle_at_7        = False
+		self.obstacle_at_8        = False
+		self.obstacle_at_9        = False
+		self.obstacle_at_10        = False
+		self.obstacle_at_11        = False
+
+		self.on_main_lane = True
+		self.transitioning_flag = False
+		self.set_path_to_main_flag  = True 
 
 
 		# self.SpawnActor = carla.command.SpawnActor
@@ -227,51 +272,76 @@ class autonomous_vehicle():
 
 		
 		# Attaching sensors
-		# self.obstacle_sensor_left_init_trans   = carla.Transform(carla.Location(z=1.5))
-		# self.obstacle_sensor_centre_init_trans = carla.Transform(carla.Location(z=1.5))
-		# self.obstacle_sensor_right_init_trans  = carla.Transform(carla.Location(z=1.5))
-		# self.collision_sensor_init_trans       = carla.Transform(carla.Location(z=0.5))
-		# self.lane_invasion_sensor_init_trans   = carla.Transform(carla.Location(z=0.5))
-
-
-		# self.obstacle_sensor_left = world.spawn_actor(self.obstacle_sensor_bp, 
-		#                                             self.obstacle_sensor_left_init_trans, 
-		#                                             attach_to=self.agent)
-
-		# self.obstacle_sensor_centre = self.world.spawn_actor(self.obstacle_sensor_bp, 
-		#                                             self.obstacle_sensor_centre_init_trans, 
-		#                                             attach_to=self.agent)
-
-		# self.obstacle_sensor_right = world.spawn_actor(self.obstacle_sensor_bp, 
-		#                                             self.obstacle_sensor_right_init_trans, 
-		#                                             attach_to=self.agent)
-
-
-		# self.collision_sensor = self.world.spawn_actor(self.collision_sensor_bp, 
-		#                                             carla.Transform(), 
-		#                                             attach_to=self.agent)
-
-		# self.lane_invasion_sensor = world.spawn_actor(self.lane_invasion_sensor_bp, 
-		#                                             self.lane_invasion_sensor_init_trans, 
-		#                                             attach_to=self.agent)
 
 		self.collision_sensor       = CollisionSensor(self.agent)
 
 		self.lane_invasion_sensor   = LaneInvasionSensor(self.agent)
 		
-		self.obstacle_sensor_centre = ObstacleSensor(self.agent)
-		self.obstacle_sensor_centre.bp.set_attribute('distance','5')
-		self.obstacle_sensor_centre.spawn(0,0,0,0)
+		self.obstacle_sensor_1   = ObstacleSensor(self.agent)
+		self.obstacle_sensor_1.bp.set_attribute('distance','4')
+		self.obstacle_sensor_1.bp.set_attribute('hit_radius','1')
+		# self.obstacle_sensor_1.bp.set_attribute('debug_linetrace','true')
+		self.obstacle_sensor_1.spawn(0,0,1,-90)
+		
+		self.obstacle_sensor_2   = ObstacleSensor(self.agent)
+		self.obstacle_sensor_2.bp.set_attribute('distance','4.5')
+		self.obstacle_sensor_2.bp.set_attribute('hit_radius','1')
+		# self.obstacle_sensor_2.bp.set_attribute('debug_linetrace','true')
+		self.obstacle_sensor_2.spawn(0,0,1,-50)
 
-		self.obstacle_sensor_left   = ObstacleSensor(self.agent)
-		self.obstacle_sensor_left.bp.set_attribute('distance','5')
-		self.obstacle_sensor_left.spawn(0,0,0,-45)
+		self.obstacle_sensor_3   = ObstacleSensor(self.agent)
+		self.obstacle_sensor_3.bp.set_attribute('distance','6')
+		self.obstacle_sensor_3.bp.set_attribute('hit_radius','1')
+		# self.obstacle_sensor_3.bp.set_attribute('debug_linetrace','true')
+		self.obstacle_sensor_3.spawn(0,0,1,-25)
 
-		self.obstacle_sensor_right  = ObstacleSensor(self.agent)
-		self.obstacle_sensor_right.bp.set_attribute('distance','5')
-		self.obstacle_sensor_right.spawn(0,0,0,45)
+		self.obstacle_sensor_4   = ObstacleSensor(self.agent)
+		self.obstacle_sensor_4.bp.set_attribute('distance','8')
+		self.obstacle_sensor_4.bp.set_attribute('hit_radius','1')
+		# self.obstacle_sensor_4.bp.set_attribute('debug_linetrace','true')
+		self.obstacle_sensor_4.spawn(0,0,1,-10)
 
+		self.obstacle_sensor_5   = ObstacleSensor(self.agent)
+		self.obstacle_sensor_5.bp.set_attribute('distance','10')
+		self.obstacle_sensor_5.bp.set_attribute('hit_radius','1')
+		# self.obstacle_sensor_5.bp.set_attribute('debug_linetrace','true')
+		self.obstacle_sensor_5.spawn(0,0,1,0)
 
+		self.obstacle_sensor_6   = ObstacleSensor(self.agent)
+		self.obstacle_sensor_6.bp.set_attribute('distance','8')
+		self.obstacle_sensor_6.bp.set_attribute('hit_radius','1')
+		# self.obstacle_sensor_6.bp.set_attribute('debug_linetrace','true')
+		self.obstacle_sensor_6.spawn(0,0,1,10)
+		
+		self.obstacle_sensor_7   = ObstacleSensor(self.agent)
+		self.obstacle_sensor_7.bp.set_attribute('distance','6')
+		self.obstacle_sensor_7.bp.set_attribute('hit_radius','1')
+		# self.obstacle_sensor_7.bp.set_attribute('debug_linetrace','true')
+		self.obstacle_sensor_7.spawn(0,0,1,25)
+
+		self.obstacle_sensor_8   = ObstacleSensor(self.agent)
+		self.obstacle_sensor_8.bp.set_attribute('distance','4.5')
+		self.obstacle_sensor_8.bp.set_attribute('hit_radius','1')
+		# self.obstacle_sensor_8.bp.set_attribute('debug_linetrace','true')
+		self.obstacle_sensor_8.spawn(0,0,1,50)
+
+		self.obstacle_sensor_9   = ObstacleSensor(self.agent)
+		self.obstacle_sensor_9.bp.set_attribute('distance','4')
+		self.obstacle_sensor_9.bp.set_attribute('hit_radius','1')
+		# self.obstacle_sensor_9.bp.set_attribute('debug_linetrace','true')
+		self.obstacle_sensor_9.spawn(0,0,1,90)
+
+		self.obstacle_sensor_10   = ObstacleSensor(self.agent)
+		self.obstacle_sensor_10.bp.set_attribute('distance','10.8')
+		self.obstacle_sensor_10.bp.set_attribute('hit_radius','1')
+		# self.obstacle_sensor_10.bp.set_attribute('debug_linetrace','true')
+		self.obstacle_sensor_10.spawn(0,0,1,21.8)
+
+		self.obstacle_sensor_11   = ObstacleSensor(self.agent)
+		self.obstacle_sensor_11.bp.set_attribute('distance','10.8')
+		self.obstacle_sensor_11.bp.set_attribute('hit_radius','1')
+		# self.obstacle_sensor_11.bp.set_attribute('debug_linetrace','true')
+		self.obstacle_sensor_11.spawn(0,0,1,-21.8)
 		
 
 
@@ -280,14 +350,24 @@ class autonomous_vehicle():
 		self.dest_y = y 
 		self.dest_z = z 
 
-		self.PathPlan()
+		interpolation_resolution_min = 1
+		self.main_path     = interpolate_path([(self.spawn_point_x, self.spawn_point_y),(self.dest_x,self.dest_y)], interpolation_resolution_min)
+		self.opposite_path = interpolate_path([(self.spawn_point_x, self.spawn_point_y+3.5),(self.dest_x,self.dest_y+3.5)], interpolation_resolution_min)
+		self.path = self.main_path
+		# wx = [self.spawn_point_x, 29.4, 41.5]
+		# wy = [self.spawn_point_y, -41.2,-47.4]
+		wx = [waypoint[0] for waypoint in self.main_path]
+		wy = [waypoint[1] for waypoint in self.main_path]
+		self.tx, self.ty, self.tyaw, self.tc, self.csp = generate_target_course(wx, wy)
+
+		# self.PathPlan()
 
 		print("Vehicle destination set!")
 
 	def set_path(self,path_coord_tuple):
 
-		self.path = path_coord_tuple  # [(x1,y1), (x1,y1), ...]
-
+		self.main_path = path_coord_tuple  # [(x1,y1), (x1,y1), ...]
+		self.path = self.main_path
 
 		
 	def function_handler(self, event):
@@ -297,37 +377,11 @@ class autonomous_vehicle():
 
 	def step(self):
 		print("==================")
-		# # Check if exection trigger is on
-		# with open(self.execute_trigger_file, 'r') as f:
-		#   lines = csv.reader(f, delimiter=',', quotechar='|')
-		#   rows = list(lines)
 
-		# try:
-		#   MoveToDestination = rows[0][0]
-		# except:
-		#   MoveToDestination = "False"
-
-		# if MoveToDestination == "True":
-		#   self.stop = True
-		# else:
-		#   self.stop = False
-
-		# Get update of the world state
+		# == Get update of the world state =================
 		self.world_snapshot = self.world.get_snapshot()
-
 		self.Update_state_info()
 
-
-		if self.stop == True:
-			self.send_control(0, 0, 1, hand_brake=False, reverse=False)
-		else:
-			# self.send_control(self.throttle, 0, 1, hand_brake=False, reverse=False)
-			self.get_to_destination()   
-			# self.controller()
-
-		# print(self.collision_sensor.get_collision_history()) #STOPPED HERE need to get a reading of the collision live
-		
-		
 
 		# == Collision sensor update =======================
 		# Check if there are any collsions
@@ -368,7 +422,279 @@ class autonomous_vehicle():
 
 
 		# == Obstacle sensor update =====================
-		# self.obstacle_sensor
+		try:
+			if not self.obstacle_sensor_1.timestamp == self.obstacle_sensor_1_previous_timestamp and self.obstacle_sensor_1.other_actor.type_id == "vehicle.tesla.model3" :
+				if self.obstacle_sensor_1.other_actor.type_id == "vehicle.tesla.model3":
+					self.obstacle_at_1 = True
+					print("self.obstacle_at_1 = ", self.obstacle_at_1)
+				else:
+					self.obstacle_at_1 = False 
+				self.obstacle_sensor_1_previous_timestamp = self.obstacle_sensor_1.timestamp
+			else:
+				self.obstacle_at_1 = False
+		except:
+			self.obstacle_at_1 = False
+
+		try:
+			if not self.obstacle_sensor_2.timestamp == self.obstacle_sensor_2_previous_timestamp and self.obstacle_sensor_2.other_actor.type_id == "vehicle.tesla.model3" :
+				if self.obstacle_sensor_2.other_actor.type_id == "vehicle.tesla.model3":
+					self.obstacle_at_2 = True
+					print("self.obstacle_at_2 = ", self.obstacle_at_2)
+				else:
+					self.obstacle_at_2 = False
+				self.obstacle_sensor_2_previous_timestamp = self.obstacle_sensor_2.timestamp
+			else:
+				self.obstacle_at_2 = False
+		except:
+			self.obstacle_at_2 = False
+
+		try:
+			if not self.obstacle_sensor_3.timestamp == self.obstacle_sensor_3_previous_timestamp and self.obstacle_sensor_3.other_actor.type_id == "vehicle.tesla.model3" :
+				if self.obstacle_sensor_3.other_actor.type_id == "vehicle.tesla.model3":
+					self.obstacle_at_3 = True
+					print("self.obstacle_at_3 = ", self.obstacle_at_3)
+				else:
+					self.obstacle_at_3 = False
+				self.obstacle_sensor_3_previous_timestamp = self.obstacle_sensor_3.timestamp
+			else:
+				self.obstacle_at_3 = False
+		except:
+			self.obstacle_at_3 = False
+
+		try:
+			if not self.obstacle_sensor_4.timestamp == self.obstacle_sensor_4_previous_timestamp: 
+				if self.obstacle_sensor_4.other_actor.type_id == "vehicle.tesla.model3":
+					self.obstacle_at_4 = True
+					print("self.obstacle_at_4 = ", self.obstacle_at_4)
+				else:
+					self.obstacle_at_4 = False 
+				self.obstacle_sensor_4_previous_timestamp = self.obstacle_sensor_4.timestamp
+			else:
+				self.obstacle_at_4 = False
+		except:
+			self.obstacle_at_4 = False
+
+		try:
+			if not self.obstacle_sensor_5.timestamp == self.obstacle_sensor_5_previous_timestamp:
+				print("self.obstacle_sensor_5 = ", self.obstacle_sensor_5.other_actor.type_id)
+				if self.obstacle_sensor_5.other_actor.type_id == "vehicle.tesla.model3":
+					print("self.obstacle_at_5 = ", self.obstacle_at_5) 
+					self.obstacle_at_5 = True 
+				self.obstacle_sensor_5_previous_timestamp = self.obstacle_sensor_5.timestamp
+			else:
+				self.obstacle_at_5 = False
+		except:
+			self.obstacle_at_5 = False
+
+		try:
+			if not self.obstacle_sensor_6.timestamp == self.obstacle_sensor_6_previous_timestamp and self.obstacle_sensor_6.other_actor.type_id == "vehicle.tesla.model3" :
+				if self.obstacle_sensor_6.other_actor.type_id == "vehicle.tesla.model3":
+					self.obstacle_at_6 = True
+					print("self.obstacle_at_6 = ", self.obstacle_at_6)
+				else:
+					self.obstacle_at_6 = False 
+				self.obstacle_sensor_6_previous_timestamp = self.obstacle_sensor_6.timestamp
+			else:
+				self.obstacle_at_6 = False
+		except:
+			self.obstacle_at_6 = False
+
+		try:
+			if not self.obstacle_sensor_7.timestamp == self.obstacle_sensor_7_previous_timestamp and self.obstacle_sensor_7.other_actor.type_id == "vehicle.tesla.model3" :
+				if self.obstacle_sensor_7.other_actor.type_id == "vehicle.tesla.model3":
+					self.obstacle_at_7 = True
+					print("self.obstacle_at_7 = ", self.obstacle_at_7)
+				else:
+					self.obstacle_at_7 = False 
+				self.obstacle_sensor_7_previous_timestamp = self.obstacle_sensor_7.timestamp
+			else:
+				self.obstacle_at_7 = False
+		except:
+			self.obstacle_at_7 = False
+
+		try:
+			if not self.obstacle_sensor_8.timestamp == self.obstacle_sensor_8_previous_timestamp and self.obstacle_sensor_8.other_actor.type_id == "vehicle.tesla.model3" :
+				if self.obstacle_sensor_8.other_actor.type_id == "vehicle.tesla.model3":
+					self.obstacle_at_8 = True
+					print("self.obstacle_at_8 = ", self.obstacle_at_8)
+				else:
+					self.obstacle_at_8 = False 
+				self.obstacle_sensor_8_previous_timestamp = self.obstacle_sensor_8.timestamp
+			else:
+				self.obstacle_at_8 = False
+		except:
+			self.obstacle_at_8 = False
+
+		try:
+			if not self.obstacle_sensor_9.timestamp == self.obstacle_sensor_9_previous_timestamp and self.obstacle_sensor_9.other_actor.type_id == "vehicle.tesla.model3" :
+				if self.obstacle_sensor_9.other_actor.type_id == "vehicle.tesla.model3":
+					self.obstacle_at_9 = True
+					print("self.obstacle_at_9 = ", self.obstacle_at_9)
+				else:
+					self.obstacle_at_9 = False 
+				self.obstacle_sensor_9_previous_timestamp = self.obstacle_sensor_9.timestamp
+			else:
+				self.obstacle_at_9 = False
+		except:
+			self.obstacle_at_9 = False
+
+		try:
+			if not self.obstacle_sensor_10.timestamp == self.obstacle_sensor_10_previous_timestamp and self.obstacle_sensor_10.other_actor.type_id == "vehicle.tesla.model3" :
+				if self.obstacle_sensor_10.other_actor.type_id == "vehicle.tesla.model3":
+					self.obstacle_at_10 = True
+					print("self.obstacle_at_10 = ", self.obstacle_at_10)
+				else:
+					self.obstacle_at_10 = False 
+				self.obstacle_sensor_10_previous_timestamp = self.obstacle_sensor_10.timestamp
+			else:
+				self.obstacle_at_10 = False
+		except:
+			self.obstacle_at_10 = False
+
+
+
+		# ==  Check if vehicle is on main lane  and whether it has reached it is set path================
+		# if self.current_y <=130.5 and self.current_y >= 128.5:#Measure the distance between main path and vheicle location > threshold:
+		# 	self.on_main_lane = True
+		# 	self.transitioning_flag = False
+		print("current_yaw = ",self.current_yaw)
+		if self.set_path_to_main_flag == False and self.current_y < 133.0:
+			self.on_main_lane = True
+			self.transitioning_flag = True
+
+		elif self.set_path_to_main_flag == False and self.current_y >= 133.0:
+			self.on_main_lane = False
+			self.transitioning_flag = False
+
+		elif self.set_path_to_main_flag == True and self.current_y > 130.5:
+			self.on_main_lane = False
+			self.transitioning_flag = True
+
+		elif self.set_path_to_main_flag == True and self.current_y <= 130.5:
+			self.on_main_lane = True
+			self.transitioning_flag = False
+
+		if self.current_yaw > 0.1 or self.current_yaw < -0.1:
+			self.transitioning_flag = True
+
+
+		# if self.set_path_to_main_flag == True and self.current_y <=130.5:#Measure the distance between main path and vheicle location > threshold:
+		# 	self.on_main_lane = True
+		# 	self.transitioning_flag = True
+
+
+
+		# # ==  Check if vehicle is transitioning between lanes ================
+		# if Measure the distance between set path and vheicle location >  thershold2:
+		# 	self.transitioning_flag = True
+		# else:
+		# 	self.transitioning_flag = False
+
+
+
+		# == Check if exection button is on ================
+		with open(self.execute_trigger_file, 'r') as f:
+			lines = csv.reader(f, delimiter=',', quotechar='|')
+			rows = list(lines)
+
+		# print("list of vehicles = ",self.world.get_actors().filter("vehicle.tesla.model3"))
+
+		try:
+			ExecuteButtonFlag = rows[0][0]
+		except:
+			ExecuteButtonFlag = "False"
+
+		if ExecuteButtonFlag == "True" and len(self.world.get_actors().filter("vehicle.tesla.model3")) > 0:
+		
+			# == Behaviour tree =====================
+			print("self.current_y = ", self.current_y)
+			# print("self.obstacle_sensor_5.other_actor.type_id == 'vehicle.tesla.model3' = ",self.obstacle_sensor_5.other_actor.type_id == "vehicle.tesla.model3")
+			# print(self.obstacle_sensor_5.other_actor.type_id)
+			print("self.transitioning_flag = ", self.transitioning_flag)
+			print("self.on_main_lane = ", self.on_main_lane)
+			print("self.set_path_to_main_flag = ", self.set_path_to_main_flag)
+			# self.stop = False
+
+			if self.transitioning_flag:
+				self.stop = False
+
+			elif self.on_main_lane:
+				# Check opposite lane 
+				print("I am in zero")
+				print("self.obstacle_at_4 = ",self.obstacle_at_4)
+				print("self.obstacle_at_5 = ",self.obstacle_at_5)
+				print("self.obstacle_at_6 = ",self.obstacle_at_6)
+				print("any([self.obstacle_at_4, self.obstacle_at_5, self.obstacle_at_6]) = ",any([self.obstacle_at_4, self.obstacle_at_5, self.obstacle_at_6]))
+				if any([self.obstacle_at_4, self.obstacle_at_5, self.obstacle_at_6]):
+					print("I am in one")
+					if not any([self.obstacle_at_7, self.obstacle_at_8, self.obstacle_at_9, self.obstacle_at_10]):
+						print("I am in two")
+						self.path = self.opposite_path
+						self.set_path_to_main_flag = False
+						self.stop = False
+						# self.transitioning_flag = True
+					else:
+						self.path = self.main_path
+						self.stop = True
+				else:
+					self.path = self.main_path
+					self.stop = False
+			
+			elif not self.on_main_lane:
+				# Check main lane
+				if any([self.obstacle_at_1, self.obstacle_at_2, self.obstacle_at_3, self.obstacle_at_11]): 
+					self.path = self.opposite_path
+					self.set_path_to_main_flag = False
+					self.stop = False
+					if any([self.obstacle_at_4, self.obstacle_at_5, self.obstacle_at_6]):
+						self.stop = True
+				else :
+					self.path = self.main_path
+					self.set_path_to_main_flag = True
+					self.stop = False
+
+
+
+				# elif any([self.obstacle_at_1, self.obstacle_at_2, self.obstacle_at_3]) and not any([self.obstacle_at_4, self.obstacle_at_5, self.obstacle_at_6]):
+				# 	self.path = self.opposite_path
+				# 	self.stop = False
+				# elif not any([self.obstacle_at_4, self.obstacle_at_5, self.obstacle_at_6]):
+				# 	self.path = self.main_path
+				# 	self.stop = False
+
+		else:
+			self.stop = True
+
+
+
+
+
+
+		# try:
+			# if self.obstacle_sensor_centre.obstacle_ahead == True and not self.obstacle_sensor_centre.timestamp == self.obstacle_sensor_centre_previous_timestamp:
+			# if not self.obstacle_sensor_centre.timestamp == self.obstacle_sensor_centre_previous_timestamp:
+			# 	self.front_obstacle = True 
+			# 	self.obstacle_sensor_centre_previous_timestamp = self.obstacle_sensor_centre.timestamp
+				# self.stop = True
+				# self.frenet_flag = True
+			# else:
+				# self.stop = False
+				# self.frenet_flag = False
+
+		# except:
+		# 	pass
+			# self.stop = False
+			# self.frenet_flag = False
+
+
+
+		# == Controls update ============================
+		if self.stop == True:
+			self.send_control(0, 0, 1, hand_brake=False, reverse=False)
+		else:
+			self.get_to_destination()
+
+
 
 
 		
@@ -388,7 +714,7 @@ class autonomous_vehicle():
 		self.current_y                  = agent_location.y
 		self.current_z                  = agent_location.z
 		self.current_yaw                = wraptopi(math.radians(agent_rotation.yaw))
-		self.current_velocity                = np.array([agent_velocity.x, agent_velocity.y, agent_velocity.z])      # This is an array as opposed to agent_velocity, which is an object
+		self.current_velocity           = np.array([agent_velocity.x, agent_velocity.y, agent_velocity.z])      # This is an array as opposed to agent_velocity, which is an object
 		self.current_speed              = np.sqrt(self.current_velocity.dot(self.current_velocity))
 
 
@@ -402,9 +728,17 @@ class autonomous_vehicle():
 		sensors = [
 			self.collision_sensor.sensor,
 			self.lane_invasion_sensor.sensor,
-			self.obstacle_sensor_centre.sensor,
-			self.obstacle_sensor_left.sensor,
-			self.obstacle_sensor_right.sensor]
+			self.obstacle_sensor_1.sensor,
+			self.obstacle_sensor_2.sensor,
+			self.obstacle_sensor_3.sensor,
+			self.obstacle_sensor_4.sensor,
+			self.obstacle_sensor_5.sensor,
+			self.obstacle_sensor_6.sensor,
+			self.obstacle_sensor_7.sensor,
+			self.obstacle_sensor_8.sensor,
+			self.obstacle_sensor_9.sensor,
+			self.obstacle_sensor_10.sensor,
+			self.obstacle_sensor_11.sensor]
 
 		for sensor in sensors:
 			if sensor is not None:
@@ -417,9 +751,10 @@ class autonomous_vehicle():
 	def get_actors_xy_pos(self):
 		flag = False
 		actors = self.world.get_actors()
+		# print("actors = ",actors)
 		actors_pos = np.array([[]])
 		for actor in actors:
-			if ("vehicle" in actor.type_id) or ("walker.pedestrian" in actor.type_id):
+			if ("vehicle.tesla.model3" in actor.type_id) or ("walker.pedestrian" in actor.type_id):
 				
 				if actor.id == self.agent.id:
 					continue # don't take pos of AV as one of the actors
@@ -431,16 +766,19 @@ class autonomous_vehicle():
 					flag = True
 				else:
 					actors_pos = np.append(actors_pos,[[actor_location.x,actor_location.y]],axis=0)
-		print("actors_pos = ",actors_pos)
+		# print("actors_pos = ",actors_pos)
 		return actors_pos
 
 
 	def get_to_destination(self):
 
-		# Check if sensor detected and obstacle (Need to add the obstacles first)
-
-		# If obstacle detected use frenet to recalcualte path
-
+		# # If obstacle detected use frenet to recalcualte path
+		# if self.frenet_flag:
+		# 	print("I am path planning")
+		self.PathPlan()
+		# else:
+		# 	print("I am not path planning")
+		# 	self.path = self.main_path
 
 		# Send control
 		throttle, brake, steer = self.controller.step(self.path, self.vehicle_speed, self.current_x, self.current_y, self.current_yaw, self.current_speed)
@@ -538,62 +876,96 @@ class autonomous_vehicle():
 
 
 	def PathPlan(self):
-		# spawn_pos = [self.spawn_point_x,self.spawn_point_y]
-		# destination_pos = [self.dest_x,self.dest_y] 
-		# want_to_plot_path = False
-		# want_to_plot = False
-		# plot_every       = 10
-		
-		# xStart = spawn_pos_idx = find_nearest(self.map_x_coord, spawn_pos[0])[0][0]
-		# yStart = spawn_pos_idy = find_nearest(self.map_y_coord, spawn_pos[1])[0][1]
+		pass
 
-		# xEnd = destination_pos_idx = find_nearest(self.map_x_coord, destination_pos[0])[0][0]
-		# yEnd = destination_pos_idy =find_nearest(self.map_y_coord, destination_pos[1])[0][1]
+		# # Check which obstacle sensor is on. 
+		# if front obstacle sensor is off:
+		# 	self.path = self.main_path
+		# 	self.on_main_lane = True
 
-		# start = (xStart, yStart)
-		# end = (xEnd, yEnd)
-		# cost = 1 # cost per movement
+		# elif front obsacle is on and right hand side obstacle sensor and right-front obstacle sensors are off:
+		# 	self.path = self.opposite_path
+		# 	self.on_main_lane = False
 
-		# # Plot_map(AV_pos, Target_pos, map_objects, map_x_coord, map_y_coord)
+		# if not self.on_main_lane and left hand side obstacle sensor and left-front obstacle sensors are off:
+		# 	self.path = self.main_path
+		# 	self.on_main_lane = True
 
-		# path, path_mat = astar_search(start, end, cost, spawn_pos, destination_pos, self.occupancy_grid, self.map_x_coord, self.map_y_coord, want_to_plot,plot_every)
 
-		# path_coord = []
-		# for i in range(len(path)):
-		#   coord_tuple = (self.map_x_coord[path[i]],self.map_y_coord[path[i]])
-		#   path_coord.append(coord_tuple)
-		# self.main_path = path_coord
-		# self.path_shapely_line = LineString(self.main_path)
-		# print(self.path_shapely_line)
 
+
+		# #################################################################
 		# wx = [x[0] for x in path_coord]
 		# wy = [x[1] for x in path_coord]
 
-		# TODO Interpolate here to create path of wx and wy
-		interpolation_resolution_min = 1
-		self.path = interpolate_path([(self.spawn_point_x, self.spawn_point_y),(self.dest_x,self.dest_y)], interpolation_resolution_min)
-		wx = []
-		wy = []
-		for point in self.path:
-			wx.append(point[0])
-			wy.append(point[1])
+		# self.tx, self.ty, self.tyaw, self.tc, self.csp = generate_target_course(wx, wy)
 
-		# print("AV_path = ", AV_path)
-		# print("wx = ", wx)
-		# print("wy = ", wy)
-		# wx = [self.spawn_point_x, 29.4, self.dest_x]
-		# wy = [self.spawn_point_y, -41.2,self.dest_y]
-		# wx = [self.spawn_point_x, 29.4, 41.5]
-		# wy = [self.spawn_point_y, -41.2,-47.4]
+		# # Update actors positions
+		# ob = self.get_actors_xy_pos()
+		# print("ob = ", ob)
 
-		self.tx, self.ty, self.tyaw, self.tc, self.csp = generate_target_course(wx, wy)
-		# print("tx = ",self.tx)
-		# print("ty = ",self.ty)
-		# print("tyaw = ",self.tyaw)
-		# print("tc = ",self.tc)
-		# print("tcsp = ",self.tcsp)
-		# if want_to_plot_path:
-		#   self.Plot_path(spawn_pos, destination_pos, self.occupancy_grid, self.map_x_coord, self.map_y_coord, path_coord)
+		# # Update variables for frenet 
+		# if self.frenet_start_flag:
+		# 	s0 = 0.0  # current course position
+		# 	c_d = 0 # current lateral position [m]
+		# 	c_d_d = 0.0  # current lateral speed [m/s]
+		# 	c_d_dd = 0.0  # current lateral acceleration [m/s]
+		# 	c_speed = 5  # current speed [m/s]
+
+		# 	self.frenet_start_flag = False
+		# 	print("===================================================")
+		# 	print("I am hereeeeeeeeeeeeeeeeeeeeeeeeeeeee!!!!!!!!!!")
+		# 	print("===================================================")
+		# else:
+		# 	min_dist = float("inf")
+		# 	# print("len(self.path.s) = ",len(self.path.s))
+		# 	# print("len(self.path.x) = ",len(self.path.x))
+
+		# 	for i in range(len(self.frenet_path.x)):
+		# 		dist_AV_to_traj_point = calculateDistance(self.frenet_path.x[i], self.frenet_path.y[i], self.current_x, self.current_y)
+		# 		if dist_AV_to_traj_point < min_dist:
+		# 			min_dist = dist_AV_to_traj_point           
+		# 			index = i
+
+		# 	s0 = self.frenet_path.s[index]
+		# 	c_d = self.frenet_path.d[index]
+		# 	c_d_d = self.frenet_path.d_d[index]
+		# 	c_d_dd = self.frenet_path.d_dd[index]
+		# 	c_speed = self.current_speed
+
+		# # check c_speed < 1, frentet optimisor fails if c_speed<1
+		# if c_speed < 1:
+		# 	c_speed = 1
+
+		# print("==================")
+		# print("s0 = ", s0)
+		# print("==================")
+		# # frenet_optimal_planning
+		# self.frenet_path = frenet_optimal_planning(self.csp, s0, c_speed,c_d, c_d_d, c_d_dd, ob)
+		# print("frenet_path = ",self.frenet_path)
+		# # print("newpath = ",self.newpath)
+		# if self.frenet_path == None:
+		# 	self.path = self.path
+		# 	# print("path = ",self.path)
+		# 	# print("newpath = ",self.newpath)
+		# 	# print("c_speed = ",c_speed)
+		# 	# print("s0 = ",s0)
+		# 	# print("c_d = ",c_d)
+		# 	# print("c_d_d = ",c_d_d)
+		# 	# print("c_d_dd = ",c_d_dd)
+
+		# else:
+		# 	self.path = []
+		# 	x = []
+		# 	y = []
+		# 	for temp_i in range(len(self.frenet_path.x)):
+		# 		self.path.append((self.frenet_path.x[temp_i],self.frenet_path.y[temp_i])) 
+		# 		x.append(self.frenet_path.x[temp_i]) 
+		# 		y.append(self.frenet_path.y[temp_i]) 
+
+		# plt.plot(x,y)
+		# plt.savefig("temp.png")
+		
 
 	def send_control(self, throttle, steer, brake, hand_brake=False, reverse=False):
 		self.control = carla.VehicleControl()

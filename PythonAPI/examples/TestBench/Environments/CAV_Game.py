@@ -69,13 +69,13 @@ class AV_on_Stright_Road():
 		x_dest = 176.58
 		y_dest = 129.74
 		z_dest = 0.30 
-		# self.AV.set_destination(x_dest,y_dest,z_dest)
+		self.AV.set_destination(x_dest,y_dest,z_dest)
 		# self.AV_path = [(119.46, 129.75), (176.58, 129.74)]
 		# self.AV_path = [(119.46, 129.75), (156.58, 145.74), (176.58, 129.74)]
-		self.AV_path = [(119.46, 129.75), (136.58, 132.74), (155.58, 129.74), (176.58, 129.74)]
-		interpolation_resolution_min = 1
-		self.AV_path_interpolated  = interpolate_path(self.AV_path, interpolation_resolution_min)
-		self.AV.set_path(self.AV_path_interpolated)
+		# self.AV_path = [(119.46, 129.75), (136.58, 132.74), (155.58, 129.74), (176.58, 129.74)]
+		# interpolation_resolution_min = 1
+		# self.AV_path_interpolated  = interpolate_path(self.AV_path, interpolation_resolution_min)
+		# self.AV.set_path(self.AV_path_interpolated)
 
 		self.AV.vehicle_speed = 5
 

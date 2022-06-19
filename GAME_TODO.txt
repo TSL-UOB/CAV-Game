@@ -33,8 +33,13 @@ RMB for
 
   - Plot the frenet path of the vehicle in UE4...
   - Only exectute repath planning using frenet if there is an obstacle.
-  - Using the static AV path or the frenet controller both result in the AV not bevhaing following path properly. Need to try first to do see if I can let AV follow path like in assertions code then switch to the frenet.
-
+  - Start inegrating the frenet controller, so then to tweak the sensors
+  - Only make OpenScenario kill the vehicles when they have arrived and the AV arrived Or when the gamer presses terminate scenario.
+  - Allow openScenario to spawn static vehciles or when you spawn automatically generate a spline point.
+  - Stop game run from ending until AV arrives or player terminates
+  - Create scoring function.
+  - Save all generated scenarios with date and time
+  - Save logs for any executed scenarios
   
 
 look at this link below and go through the imports
