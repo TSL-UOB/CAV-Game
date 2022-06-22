@@ -46,3 +46,17 @@ bool UReadWriteCoord::SaveText(FString SaveDirectory, FString FileName, FString 
 
 	return FFileHelper::SaveStringToFile(FinalString, *SaveDirectory);
 }
+
+FString UReadWriteCoord::LoadFileToString(FString Directory, FString FileName) {
+
+	// Set complete path
+	Directory += "\\";
+	Directory += FileName;
+
+	FString result;
+
+	FFileHelper::LoadFileToString(result, *Directory);
+
+	return result;
+
+}

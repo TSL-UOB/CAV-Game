@@ -33,9 +33,9 @@ def main():
 
 	try:
 
-		world.set_weather(carla.WeatherParameters.ClearNoon)
+		# world.set_weather(carla.WeatherParameters.ClearNoon)
 
-		print("PROGRESS: Weather conditions set  :)")
+		# print("PROGRESS: Weather conditions set  :)")
 
 
 		

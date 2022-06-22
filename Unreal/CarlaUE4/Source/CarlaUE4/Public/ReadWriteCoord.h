@@ -19,6 +19,9 @@ class CARLAUE4_API UReadWriteCoord : public UBlueprintFunctionLibrary
 
 		UFUNCTION(BlueprintCallable, Category = "Custom", meta = (Keywords = "Save"))
 		static bool SaveText(FString SaveDirectory, FString FileName, FString SaveText, bool AllowOverwriting);
+
+		UFUNCTION(BlueprintCallable, Category = "Custom", meta = (Keywords = "Read"))
+		static FString LoadFileToString(FString Directory, FString FileName);
 	
 };
 

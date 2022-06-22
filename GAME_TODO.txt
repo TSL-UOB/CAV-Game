@@ -35,11 +35,14 @@ RMB for
   - Only exectute repath planning using frenet if there is an obstacle.
   - Start inegrating the frenet controller, so then to tweak the sensors
   - Only make OpenScenario kill the vehicles when they have arrived and the AV arrived Or when the gamer presses terminate scenario.
+================================================
   - Allow openScenario to spawn static vehciles or when you spawn automatically generate a spline point.
-  - Stop game run from ending until AV arrives or player terminates
-  - Create scoring function.
+  - Stop game run from ending until AV arrives or player terminates or collision occuring for more than 5s- iF collision lasts for more than 5 sconds terminate game
+  - Create scoring function: Add score for delay in arriving to destination.
   - Save all generated scenarios with date and time
+  - Replay function
   - Save logs for any executed scenarios
+
   
 
 look at this link below and go through the imports

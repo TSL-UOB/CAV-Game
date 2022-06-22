@@ -195,6 +195,7 @@ class ObstacleSensor(object):
 class autonomous_vehicle():
 	def __init__(self):
 		self.execute_trigger_file = "../../../Unreal/CarlaUE4/Content/Carla/CAV_Game/Scripts/TriggerScenarioExecution.csv"
+		self.score_file = "../../../Unreal/CarlaUE4/Content/Carla/CAV_Game/Scripts/Score.csv"
 
 		self.client = client
 		self.world  = world
@@ -247,13 +248,20 @@ class autonomous_vehicle():
 		self.obstacle_at_11        = False
 
 		self.on_main_lane = True
+		self.prev_on_main_lane_value = True
 		self.transitioning_flag = False
 		self.set_path_to_main_flag  = True 
+		self.prev_set_path_to_main_flag = True
+		self.last_timestamp_on_main_lane = 0
+		self.continious_duration_on_opposite_lane = 0
+		
+		self.GameScore = 0 
 
 
 		# self.SpawnActor = carla.command.SpawnActor
 
 	def spawn(self,x,y,z,yaw):
+		self.GameScore = 0 
 		self.actor_list = []
 		self.spawn_orientation = yaw
 		self.transform         = carla.Transform(carla.Location(x=float(x), y=float(y), z=float(z)), carla.Rotation(yaw=float(self.spawn_orientation)))
@@ -387,24 +395,34 @@ class autonomous_vehicle():
 		# Check if there are any collsions
 		if len(self.collision_sensor.history) == 0:
 			print("No collsions yet.")
+			self.AV_new_collision_flag             = False
+			self.AV_stuck_in_collision_flag        = False
+			self.AV_continued_after_collision_flag = False
 
 		else:
 			# Get the current collision
 			self.current_collision = self.collision_sensor.history[-1]
 
-			# Check if current collision is the same as the last collision
-			if self.current_collision == self.last_collision:
-				print("There was collsion but AV continued moving")
-			else:
-				# If current collisiion and last collision are consecutive then it is the same collision but car stopped there else this is a new collision
-				if self.last_collision == None or (self.last_collision[0]+1) == self.current_collision[0]:
-					# print("self.last_collision[0] = ",self.last_collision[0])
-					print("Same Collision -  AV stuck")
 
-				else:
-					print("New Collision after a pre exisitng collision")
+			if self.last_collision == None:
+				self.AV_new_collision_flag             = True
+				self.AV_stuck_in_collision_flag        = False
 
-		self.last_collision == self.current_collision
+			elif self.last_collision[0] == self.current_collision[0]:
+				self.AV_new_collision_flag             = False
+				self.AV_stuck_in_collision_flag        = False
+
+			elif (self.last_collision[0]+10) >= self.current_collision[0]:
+				self.AV_new_collision_flag             = False
+				self.AV_stuck_in_collision_flag        = True
+
+			elif (self.last_collision[0]+10) < self.current_collision[0]:
+				self.AV_new_collision_flag             = True
+				self.AV_stuck_in_collision_flag        = False
+
+		# print("self.current_collision = ", self.current_collision)
+		# print("self.last_collision = ", self.last_collision)
+		self.last_collision = self.current_collision
 
 
 		# == Lane Invasion sensor update =====================
@@ -554,41 +572,47 @@ class autonomous_vehicle():
 
 
 		# ==  Check if vehicle is on main lane  and whether it has reached it is set path================
-		# if self.current_y <=130.5 and self.current_y >= 128.5:#Measure the distance between main path and vheicle location > threshold:
-		# 	self.on_main_lane = True
-		# 	self.transitioning_flag = False
-		print("current_yaw = ",self.current_yaw)
 		if self.set_path_to_main_flag == False and self.current_y < 133.0:
 			self.on_main_lane = True
 			self.transitioning_flag = True
+			self.path = self.opposite_path
 
 		elif self.set_path_to_main_flag == False and self.current_y >= 133.0:
 			self.on_main_lane = False
 			self.transitioning_flag = False
+			self.path = self.opposite_path
 
 		elif self.set_path_to_main_flag == True and self.current_y > 130.5:
 			self.on_main_lane = False
 			self.transitioning_flag = True
+			self.path = self.main_path
 
 		elif self.set_path_to_main_flag == True and self.current_y <= 130.5:
 			self.on_main_lane = True
 			self.transitioning_flag = False
+			self.path = self.main_path
 
 		if self.current_yaw > 0.1 or self.current_yaw < -0.1:
 			self.transitioning_flag = True
 
 
-		# if self.set_path_to_main_flag == True and self.current_y <=130.5:#Measure the distance between main path and vheicle location > threshold:
-		# 	self.on_main_lane = True
-		# 	self.transitioning_flag = True
+		# == Check if set path change is not too quick
+		# if self.set_path_to_main_flag == True and self.prev_set_path_to_main_flag == False:
+		# 	self.last_change_path_timestamp = self.current_t
+		# 	self.prev_set_path_to_main_flag = self.set_path_to_main_flag
 
+		# elif self.set_path_to_main_flag == False and self.prev_set_path_to_main_flag == True:
+		# 	self.last_change_path_timestamp = self.current_t
+		# 	self.prev_set_path_to_main_flag = self.set_path_to_main_flag
+		# print("self.last_change_path_timestamp = ",self.last_change_path_timestamp)
+		# print("self.diff = ",self.current_t - self.last_change_path_timestamp)
+		# if (self.current_t - self.last_change_path_timestamp) < 1:
+		# 	print("I AM INNNNNNNNNNNNNNNNNNNNNNNNNNN")
+		# 	if self.set_path_to_main_flag == True:
+		# 		self.path = self.opposite_path
 
-
-		# # ==  Check if vehicle is transitioning between lanes ================
-		# if Measure the distance between set path and vheicle location >  thershold2:
-		# 	self.transitioning_flag = True
-		# else:
-		# 	self.transitioning_flag = False
+		# 	if self.set_path_to_main_flag == False:
+		# 		self.path = self.main_path
 
 
 
@@ -607,28 +631,47 @@ class autonomous_vehicle():
 		if ExecuteButtonFlag == "True" and len(self.world.get_actors().filter("vehicle.tesla.model3")) > 0:
 		
 			# == Behaviour tree =====================
-			print("self.current_y = ", self.current_y)
+			# print("self.current_y = ", self.current_y)
 			# print("self.obstacle_sensor_5.other_actor.type_id == 'vehicle.tesla.model3' = ",self.obstacle_sensor_5.other_actor.type_id == "vehicle.tesla.model3")
 			# print(self.obstacle_sensor_5.other_actor.type_id)
-			print("self.transitioning_flag = ", self.transitioning_flag)
-			print("self.on_main_lane = ", self.on_main_lane)
-			print("self.set_path_to_main_flag = ", self.set_path_to_main_flag)
+			# print("self.transitioning_flag = ", self.transitioning_flag)
+			# print("self.on_main_lane = ", self.on_main_lane)
+			# print("self.set_path_to_main_flag = ", self.set_path_to_main_flag)
 			# self.stop = False
 
 			if self.transitioning_flag:
 				self.stop = False
+				if self.set_path_to_main_flag == True:
+					if any([self.obstacle_at_1, self.obstacle_at_2, self.obstacle_at_3, self.obstacle_at_11]): 
+						self.path = self.opposite_path
+						self.set_path_to_main_flag = False
+						self.transitioning_flag = False
+
+				if self.set_path_to_main_flag == False:
+					if any([self.obstacle_at_7, self.obstacle_at_8, self.obstacle_at_9, self.obstacle_at_10]): 
+						self.path = self.main_path
+						self.set_path_to_main_flag = True
+						self.transitioning_flag = False
+					# self.set_path_to_main_flag = False
+					# self.path = self.opposite_path
+
+				# if self.set_path_to_main_flag == False and self.obstacle_at_10 == True:
+				# 	self.set_path_to_main_flag = True
+				# 	self.path = self.main_path
+
+
 
 			elif self.on_main_lane:
 				# Check opposite lane 
-				print("I am in zero")
-				print("self.obstacle_at_4 = ",self.obstacle_at_4)
-				print("self.obstacle_at_5 = ",self.obstacle_at_5)
-				print("self.obstacle_at_6 = ",self.obstacle_at_6)
-				print("any([self.obstacle_at_4, self.obstacle_at_5, self.obstacle_at_6]) = ",any([self.obstacle_at_4, self.obstacle_at_5, self.obstacle_at_6]))
+				# print("I am in zero")
+				# print("self.obstacle_at_4 = ",self.obstacle_at_4)
+				# print("self.obstacle_at_5 = ",self.obstacle_at_5)
+				# print("self.obstacle_at_6 = ",self.obstacle_at_6)
+				# print("any([self.obstacle_at_4, self.obstacle_at_5, self.obstacle_at_6]) = ",any([self.obstacle_at_4, self.obstacle_at_5, self.obstacle_at_6]))
 				if any([self.obstacle_at_4, self.obstacle_at_5, self.obstacle_at_6]):
-					print("I am in one")
+					# print("I am in one")
 					if not any([self.obstacle_at_7, self.obstacle_at_8, self.obstacle_at_9, self.obstacle_at_10]):
-						print("I am in two")
+						# print("I am in two")
 						self.path = self.opposite_path
 						self.set_path_to_main_flag = False
 						self.stop = False
@@ -654,37 +697,40 @@ class autonomous_vehicle():
 					self.stop = False
 
 
-
-				# elif any([self.obstacle_at_1, self.obstacle_at_2, self.obstacle_at_3]) and not any([self.obstacle_at_4, self.obstacle_at_5, self.obstacle_at_6]):
-				# 	self.path = self.opposite_path
-				# 	self.stop = False
-				# elif not any([self.obstacle_at_4, self.obstacle_at_5, self.obstacle_at_6]):
-				# 	self.path = self.main_path
-				# 	self.stop = False
-
 		else:
 			self.stop = True
 
+		# == Game Score =================================
+		print("self.AV_new_collision_flag = ",self.AV_new_collision_flag)
+		print("self.AV_stuck_in_collision_flag = ",self.AV_stuck_in_collision_flag)
+		try:
+			print("self.last_collision[0] = ",self.last_collision[0])
+			print("self.current_collision[0] = ",self.current_collision[0])
+		except:
+			pass
+
+		if self.AV_new_collision_flag == True and self.AV_stuck_in_collision_flag == False:
+			self.GameScore += 1000
+
+		if self.on_main_lane == True:
+			# check when we were last not on main lane
+			self.last_timestamp_on_main_lane = self.current_t
+
+		if self.on_main_lane == False:	
+			self.continious_duration_on_opposite_lane = self.current_t - self.last_timestamp_on_main_lane
+		else:
+			self.continious_duration_on_opposite_lane = 0
+
+		if self.continious_duration_on_opposite_lane > 3:
+			self.GameScore += 2
 
 
+		self.prev_on_main_lane_value = self.on_main_lane 
+	
+		f2 = open(self.score_file, "w")
+		f2.write(str(self.GameScore))
+		f2.close()
 
-
-
-		# try:
-			# if self.obstacle_sensor_centre.obstacle_ahead == True and not self.obstacle_sensor_centre.timestamp == self.obstacle_sensor_centre_previous_timestamp:
-			# if not self.obstacle_sensor_centre.timestamp == self.obstacle_sensor_centre_previous_timestamp:
-			# 	self.front_obstacle = True 
-			# 	self.obstacle_sensor_centre_previous_timestamp = self.obstacle_sensor_centre.timestamp
-				# self.stop = True
-				# self.frenet_flag = True
-			# else:
-				# self.stop = False
-				# self.frenet_flag = False
-
-		# except:
-		# 	pass
-			# self.stop = False
-			# self.frenet_flag = False
 
 
 
@@ -983,63 +1029,5 @@ class autonomous_vehicle():
 
 		self.agent.apply_control(self.control)
 		
-
-	# def Plot_path(self,AV_pos, Target_pos, map_objects, map_x_coord, map_y_coord, path_coord):
-	#   for i in np.unique(map_objects):
-	#       map_objects2 = np.array(map_objects)
-	#       result = np.where(map_objects2 == i)
-	#       x = map_x_coord[result[0],result[1]]
-	#       y = map_y_coord[result[0],result[1]]
-
-	#       if i == 1:
-	#           chosenColour = "cornflowerblue"
-	#           chosenLabel  = "North"
-	#       elif i == 2:
-	#           chosenColour = "royalblue"
-	#           chosenLabel  = "South"
-	#       elif i == 3:
-	#           chosenColour = "darkmagenta"
-	#           chosenLabel  = "East"
-	#       elif i == 4:
-	#           chosenColour = "magenta"
-	#           chosenLabel  = "West"
-	#       elif i == 5:
-	#           chosenColour = "red"
-	#           chosenLabel  = "North-East"
-	#       elif i == 6:
-	#           chosenColour = "pink"
-	#           chosenLabel  = "North-West"
-	#       elif i == 7:
-	#           chosenColour = "green"
-	#           chosenLabel  = "South-East"
-	#       elif i == 8:
-	#           chosenColour = "lime"
-	#           chosenLabel  = "South-West"
-	#       elif i == 9:
-	#           chosenColour = "darkgoldenrod"
-	#           chosenLabel  = "All Directions"
-	#       elif i == 10:
-	#           chosenColour = "lightgrey"
-	#           chosenLabel  = "Curb"
-	#       else:
-	#           chosenColour = "whitesmoke"
-	#           chosenLabel  = "Obstacle"
-
-	#       plt.scatter(x, y, s=5, marker = "s", color = chosenColour,label=chosenLabel)
-			
-	#   x_val = [x[0] for x in path_coord]
-	#   y_val = [x[1] for x in path_coord]
-		
-	#   plt.scatter(AV_pos[0],AV_pos[1], s=20, marker='x', color='black',label="Start")
-	#   plt.scatter(Target_pos[0],Target_pos[1], s=20, marker='x', color='red',label="End")
-	#   plt.plot(x_val,y_val,markersize=4,linestyle="--",color='white',label="path")
-	#   plt.legend()
-	#   # plt.draw()
-	#   # plt.pause(3)
-	#   plt.show()
-
-
-
-# class traffic_light():
 
 
