@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OpenSCENARIO>
-  <FileHeader revMajor="1" revMinor="0" date="2022-06-22T18:50:59" description="CARLA:Converted from UI" author="Gamer"/>
+  <FileHeader revMajor="1" revMinor="0" date="2022-06-24T19:05:57" description="CARLA:Converted from UI" author="Gamer"/>
   <ParameterDeclarations>
     <ParameterDeclaration name="leadingSpeed" parameterType="double" value="8.0"/>
   </ParameterDeclarations>
@@ -72,7 +72,7 @@
           <PrivateAction>
             <TeleportAction>
               <Position>
-                <WorldPosition x="167.575439" y="133.458252" z="0.1" h="3.1329049279756425"/>
+                <WorldPosition x="88.674286" y="204.769806" z="0.1" h="-1.5655098660863718"/>
               </Position>
             </TeleportAction>
           </PrivateAction>
@@ -81,7 +81,7 @@
           <PrivateAction>
             <TeleportAction>
               <Position>
-                <WorldPosition x="139.474747" y="129.344269" z="0.1" h="0.06533459771627258"/>
+                <WorldPosition x="146.540573" y="129.195679" z="0.1" h="0.05389973656355154"/>
               </Position>
             </TeleportAction>
           </PrivateAction>
@@ -90,7 +90,7 @@
           <PrivateAction>
             <TeleportAction>
               <Position>
-                <WorldPosition x="90.092674" y="197.184601" z="0.1" h="-1.5569079362857707"/>
+                <WorldPosition x="160.554291" y="133.394135" z="0.1" h="-0.02096004530570143"/>
               </Position>
             </TeleportAction>
           </PrivateAction>
@@ -112,12 +112,22 @@
                       <Route name="Route1" closed="false">
                         <Waypoint routeStrategy="shortest">
                           <Position>
-                            <WorldPosition x="167.575439" y="133.458252" z="0.1"/>
+                            <WorldPosition x="88.674286" y="204.769806" z="0.1"/>
                           </Position>
                         </Waypoint>
                         <Waypoint routeStrategy="shortest">
                           <Position>
-                            <WorldPosition x="151.397964" y="133.598801" z="0.1"/>
+                            <WorldPosition x="88.798637" y="181.247482" z="0.1"/>
+                          </Position>
+                        </Waypoint>
+                        <Waypoint routeStrategy="shortest">
+                          <Position>
+                            <WorldPosition x="89.440987" y="135.677414" z="0.00001"/>
+                          </Position>
+                        </Waypoint>
+                        <Waypoint routeStrategy="shortest">
+                          <Position>
+                            <WorldPosition x="88.925133" y="80.628418" z="-0.000005"/>
                           </Position>
                         </Waypoint>
                       </Route>
@@ -158,7 +168,7 @@
                       <EntityCondition>
                         <ReachPositionCondition tolerance="2">
                           <Position>
-                            <WorldPosition x="167.575439" y="133.458252" z="0.1"/>
+                            <WorldPosition x="88.674286" y="204.769806" z="0.1"/>
                           </Position>
                         </ReachPositionCondition>
                       </EntityCondition>
@@ -182,12 +192,17 @@
                       <Route name="Route2" closed="false">
                         <Waypoint routeStrategy="shortest">
                           <Position>
-                            <WorldPosition x="139.474747" y="129.344269" z="0.1"/>
+                            <WorldPosition x="146.540573" y="129.195679" z="0.1"/>
                           </Position>
                         </Waypoint>
                         <Waypoint routeStrategy="shortest">
                           <Position>
-                            <WorldPosition x="145.098984" y="129.71225" z="0.1"/>
+                            <WorldPosition x="149.909531" y="129.377441" z="0.1"/>
+                          </Position>
+                        </Waypoint>
+                        <Waypoint routeStrategy="shortest">
+                          <Position>
+                            <WorldPosition x="158.89238" y="129.472046" z="0.1"/>
                           </Position>
                         </Waypoint>
                       </Route>
@@ -228,7 +243,7 @@
                       <EntityCondition>
                         <ReachPositionCondition tolerance="2">
                           <Position>
-                            <WorldPosition x="139.474747" y="129.344269" z="0.1"/>
+                            <WorldPosition x="146.540573" y="129.195679" z="0.1"/>
                           </Position>
                         </ReachPositionCondition>
                       </EntityCondition>
@@ -252,17 +267,22 @@
                       <Route name="Route3" closed="false">
                         <Waypoint routeStrategy="shortest">
                           <Position>
-                            <WorldPosition x="90.092674" y="197.184601" z="0.1"/>
+                            <WorldPosition x="160.554291" y="133.394135" z="0.1"/>
                           </Position>
                         </Waypoint>
                         <Waypoint routeStrategy="shortest">
                           <Position>
-                            <WorldPosition x="91.273613" y="112.159409" z="0.0"/>
+                            <WorldPosition x="164.128235" y="133.319214" z="0.1"/>
                           </Position>
                         </Waypoint>
                         <Waypoint routeStrategy="shortest">
                           <Position>
-                            <WorldPosition x="90.678238" y="75.352615" z="-0.00001"/>
+                            <WorldPosition x="169.168121" y="133.082367" z="0.1"/>
+                          </Position>
+                        </Waypoint>
+                        <Waypoint routeStrategy="shortest">
+                          <Position>
+                            <WorldPosition x="172.304794" y="133.161621" z="0.0"/>
                           </Position>
                         </Waypoint>
                       </Route>
@@ -303,7 +323,7 @@
                       <EntityCondition>
                         <ReachPositionCondition tolerance="2">
                           <Position>
-                            <WorldPosition x="90.092674" y="197.184601" z="0.1"/>
+                            <WorldPosition x="160.554291" y="133.394135" z="0.1"/>
                           </Position>
                         </ReachPositionCondition>
                       </EntityCondition>

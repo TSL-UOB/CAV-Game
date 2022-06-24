@@ -256,6 +256,7 @@ class autonomous_vehicle():
 		self.continious_duration_on_opposite_lane = 0
 		
 		self.GameScore = 0 
+		self.execution_started_flag = False
 
 
 		# self.SpawnActor = carla.command.SpawnActor
@@ -629,6 +630,12 @@ class autonomous_vehicle():
 			ExecuteButtonFlag = "False"
 
 		if ExecuteButtonFlag == "True" and len(self.world.get_actors().filter("vehicle.tesla.model3")) > 0:
+			
+			if self.execution_started_flag == False:
+				self.execution_start_time   = self.current_t
+				self.execution_started_flag = True
+
+
 		
 			# == Behaviour tree =====================
 			# print("self.current_y = ", self.current_y)
@@ -699,6 +706,7 @@ class autonomous_vehicle():
 
 		else:
 			self.stop = True
+			self.execution_start_time = self.current_t
 
 		# == Game Score =================================
 		print("self.AV_new_collision_flag = ",self.AV_new_collision_flag)
@@ -709,6 +717,7 @@ class autonomous_vehicle():
 		except:
 			pass
 
+		# Score for collision
 		if self.AV_new_collision_flag == True and self.AV_stuck_in_collision_flag == False:
 			self.GameScore += 1000
 
@@ -716,13 +725,21 @@ class autonomous_vehicle():
 			# check when we were last not on main lane
 			self.last_timestamp_on_main_lane = self.current_t
 
+		# Score for staying in opposite lane for too long
 		if self.on_main_lane == False:	
 			self.continious_duration_on_opposite_lane = self.current_t - self.last_timestamp_on_main_lane
 		else:
 			self.continious_duration_on_opposite_lane = 0
 
 		if self.continious_duration_on_opposite_lane > 3:
-			self.GameScore += 2
+			if round(self.continious_duration_on_opposite_lane,1)%1 == 0:
+				self.GameScore += 200
+
+		# Score for delay in arrival
+		if (self.current_t - self.execution_start_time) > 14:
+			if round(self.current_t - self.execution_start_time,1)%1 == 0:
+				self.GameScore += 50
+
 
 
 		self.prev_on_main_lane_value = self.on_main_lane 

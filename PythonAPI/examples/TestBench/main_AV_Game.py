@@ -3,6 +3,10 @@ import os
 import sys
 import numpy as np
 
+import subprocess
+from subprocess import Popen, PIPE
+import signal
+
 try:
     sys.path.append(glob.glob('../../carla/dist/carla-*%d.%d-%s.egg' % (
         sys.version_info.major,
@@ -37,7 +41,9 @@ def main():
 
 		# print("PROGRESS: Weather conditions set  :)")
 
-
+		# Set logging for run
+		logging_cmd = 'python3 ~/CAV-Game/PythonAPI/examples/TestBench/CAV_Game_logging.py'
+		process = subprocess.Popen([logging_cmd], stdout=subprocess.PIPE, shell=True, preexec_fn=os.setsid)
 		
 
 		frame  = None
@@ -91,13 +97,13 @@ def main():
 
 
 	# except Exception:
-		print("Executed before destroy in exception!!!")
-		env.destroy()
-		print("Executed after destroy in exception!!!")
+		# print("Executed before destroy in exception!!!")
+		# env.destroy()
+		# print("Executed after destroy in exception!!!")
 
-		settings.synchronous_mode = False
-		world.apply_settings(settings)
-		pass
+		# settings.synchronous_mode = False
+		# world.apply_settings(settings)
+		# pass
 
 	finally:
 
@@ -106,6 +112,9 @@ def main():
 		print("Executed before destroy in finally!!!")
 		env.destroy()
 		print("Executed after destroy in finally!!!")
+
+		# Kill the logging script
+		os.killpg(os.getpgid(process.pid), signal.SIGINT)  # Send the signal to all the process groups 
 
 		settings.synchronous_mode = False
 		world.apply_settings(settings)
@@ -118,3 +127,4 @@ if __name__ == '__main__':
 		pass
 	finally:
 		print('\ndone.')
+
