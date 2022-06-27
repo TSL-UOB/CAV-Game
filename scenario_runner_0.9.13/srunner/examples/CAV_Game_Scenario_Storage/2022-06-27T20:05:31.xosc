@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OpenSCENARIO>
-  <FileHeader revMajor="1" revMinor="0" date="2022-06-27T20:09:39" description="CARLA:Converted from UI" author="Gamer"/>
+  <FileHeader revMajor="1" revMinor="0" date="2022-06-27T20:05:31" description="CARLA:Converted from UI" author="Gamer"/>
   <ParameterDeclarations>
     <ParameterDeclaration name="leadingSpeed" parameterType="double" value="8.0"/>
   </ParameterDeclarations>
@@ -10,24 +10,6 @@
     <SceneGraphFile filepath=""/>
   </RoadNetwork>
   <Entities>
-    <ScenarioObject name="vehicle1">
-      <Vehicle name="vehicle.tesla.model3" vehicleCategory="car">
-        <ParameterDeclarations/>
-        <Performance maxSpeed="69.444" maxAcceleration="200" maxDeceleration="10.0"/>
-        <BoundingBox>
-          <Center x="1.5" y="0.0" z="0.9"/>
-          <Dimensions width= "2.1" length= "4.5" height="1.8"/>
-        </BoundingBox>
-        <Axles>
-          <FrontAxle maxSteering="0.5" wheelDiameter="0.6" trackWidth="1.8" positionX="3.1" positionZ="0.3"/>
-          <RearAxle maxSteering="0.0" wheelDiameter="0.6" trackWidth="1.8" positionX="0.0" positionZ="0.3"/>
-        </Axles>
-        <Properties>
-          <Property name="type" value="simulation"/>
-          <Property name="color" value="0,0,0"/>
-        </Properties>
-      </Vehicle>
-    </ScenarioObject>
     <ScenarioObject name="vehicle_dummy">
       <Vehicle name="vehicle.tesla.model3" vehicleCategory="car">
         <ParameterDeclarations/>
@@ -50,15 +32,6 @@
   <Storyboard>
     <Init>
       <Actions>
-        <Private entityRef="vehicle1">
-          <PrivateAction>
-            <TeleportAction>
-              <Position>
-                <WorldPosition x="148.510284" y="132.463638" z="0.0" h="0.10537173874211012"/>
-              </Position>
-            </TeleportAction>
-          </PrivateAction>
-        </Private>
         <Private entityRef="vehicle_dummy">
           <PrivateAction>
             <TeleportAction>
@@ -72,76 +45,6 @@
     </Init>
     <Story name="Scenario">
       <Act name ="Behaviour">
-        <ManeuverGroup name="ManeuverGroup1" maximumExecutionCount="1">
-          <Actors selectTriggeringEntities="false">
-            <EntityRef entityRef="vehicle1"/>
-          </Actors>
-          <Maneuver name="VehicleFollowingWaypoints">
-            <Event name="RouteEvent" priority="overwrite">
-              <Action name="RouteAction">
-                <PrivateAction>
-                  <RoutingAction>
-                    <AssignRouteAction>
-                      <Route name="Route1" closed="false">
-                        <Waypoint routeStrategy="shortest">
-                          <Position>
-                            <WorldPosition x="148.510284" y="132.463638" z="0.0"/>
-                          </Position>
-                        </Waypoint>
-                        <Waypoint routeStrategy="shortest">
-                          <Position>
-                            <WorldPosition x="154.24527" y="133.07019" z="0.1"/>
-                          </Position>
-                        </Waypoint>
-                      </Route>
-                    </AssignRouteAction>
-                  </RoutingAction>
-                </PrivateAction>
-              </Action>
-              <StartTrigger>
-                <ConditionGroup>
-                  <Condition name="" delay="0" conditionEdge="rising">
-                    <ByValueCondition>
-                      <SimulationTimeCondition value="0" rule="greaterThan"/>
-                    </ByValueCondition>
-                  </Condition>
-                </ConditionGroup>
-              </StartTrigger>
-            </Event>
-            <Event name="SpeedEvent" priority="parallel">
-              <Action name="SpeedAction">
-                <PrivateAction>
-                  <LongitudinalAction>
-                    <SpeedAction>
-                      <SpeedActionDynamics dynamicsShape="step" value="0" dynamicsDimension="time"/>
-                      <SpeedActionTarget>
-                        <AbsoluteTargetSpeed value="$leadingSpeed"/>
-                      </SpeedActionTarget>
-                    </SpeedAction>
-                  </LongitudinalAction>
-                </PrivateAction>
-              </Action>
-              <StartTrigger>
-                <ConditionGroup>
-                  <Condition name="" delay="0" conditionEdge="rising">
-                    <ByEntityCondition>
-                      <TriggeringEntities triggeringEntitiesRule="any">
-                        <EntityRef entityRef="vehicle1"/>
-                      </TriggeringEntities>
-                      <EntityCondition>
-                        <ReachPositionCondition tolerance="2">
-                          <Position>
-                            <WorldPosition x="148.510284" y="132.463638" z="0.0"/>
-                          </Position>
-                        </ReachPositionCondition>
-                      </EntityCondition>
-                    </ByEntityCondition>
-                  </Condition>
-                </ConditionGroup>
-              </StartTrigger>
-            </Event>
-          </Maneuver>
-        </ManeuverGroup>
         <ManeuverGroup name="ManeuverGroup_Dummy" maximumExecutionCount="1">
           <Actors selectTriggeringEntities="false">
             <EntityRef entityRef="vehicle_dummy"/>

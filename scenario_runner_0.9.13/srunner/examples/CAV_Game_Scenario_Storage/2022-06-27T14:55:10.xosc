@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OpenSCENARIO>
-  <FileHeader revMajor="1" revMinor="0" date="2022-06-27T20:09:39" description="CARLA:Converted from UI" author="Gamer"/>
+  <FileHeader revMajor="1" revMinor="0" date="2022-06-27T14:55:10" description="CARLA:Converted from UI" author="Gamer"/>
   <ParameterDeclarations>
     <ParameterDeclaration name="leadingSpeed" parameterType="double" value="8.0"/>
   </ParameterDeclarations>
@@ -28,7 +28,7 @@
         </Properties>
       </Vehicle>
     </ScenarioObject>
-    <ScenarioObject name="vehicle_dummy">
+    <ScenarioObject name="vehicle2">
       <Vehicle name="vehicle.tesla.model3" vehicleCategory="car">
         <ParameterDeclarations/>
         <Performance maxSpeed="69.444" maxAcceleration="200" maxDeceleration="10.0"/>
@@ -54,16 +54,16 @@
           <PrivateAction>
             <TeleportAction>
               <Position>
-                <WorldPosition x="148.510284" y="132.463638" z="0.0" h="0.10537173874211012"/>
+                <WorldPosition x="140.087845" y="129.922043" z="0.1" h="-0.08244551589929043"/>
               </Position>
             </TeleportAction>
           </PrivateAction>
         </Private>
-        <Private entityRef="vehicle_dummy">
+        <Private entityRef="vehicle2">
           <PrivateAction>
             <TeleportAction>
               <Position>
-                <WorldPosition x="88.628464" y="324.232758" z="0.1" h="-1.5681166769968584"/>
+                <WorldPosition x="155.59584" y="133.552841" z="0.1" h="-0.005487633505969755"/>
               </Position>
             </TeleportAction>
           </PrivateAction>
@@ -85,12 +85,17 @@
                       <Route name="Route1" closed="false">
                         <Waypoint routeStrategy="shortest">
                           <Position>
-                            <WorldPosition x="148.510284" y="132.463638" z="0.0"/>
+                            <WorldPosition x="140.087845" y="129.922043" z="0.1"/>
                           </Position>
                         </Waypoint>
                         <Waypoint routeStrategy="shortest">
                           <Position>
-                            <WorldPosition x="154.24527" y="133.07019" z="0.1"/>
+                            <WorldPosition x="145.634781" y="129.463684" z="0.1"/>
+                          </Position>
+                        </Waypoint>
+                        <Waypoint routeStrategy="shortest">
+                          <Position>
+                            <WorldPosition x="150.193802" y="129.422165" z="0.000005"/>
                           </Position>
                         </Waypoint>
                       </Route>
@@ -131,7 +136,7 @@
                       <EntityCondition>
                         <ReachPositionCondition tolerance="2">
                           <Position>
-                            <WorldPosition x="148.510284" y="132.463638" z="0.0"/>
+                            <WorldPosition x="140.087845" y="129.922043" z="0.1"/>
                           </Position>
                         </ReachPositionCondition>
                       </EntityCondition>
@@ -142,9 +147,9 @@
             </Event>
           </Maneuver>
         </ManeuverGroup>
-        <ManeuverGroup name="ManeuverGroup_Dummy" maximumExecutionCount="1">
+        <ManeuverGroup name="ManeuverGroup2" maximumExecutionCount="1">
           <Actors selectTriggeringEntities="false">
-            <EntityRef entityRef="vehicle_dummy"/>
+            <EntityRef entityRef="vehicle2"/>
           </Actors>
           <Maneuver name="VehicleFollowingWaypoints">
             <Event name="RouteEvent" priority="overwrite">
@@ -152,20 +157,20 @@
                 <PrivateAction>
                   <RoutingAction>
                     <AssignRouteAction>
-                      <Route name="Route_dummy" closed="false">
+                      <Route name="Route2" closed="false">
                         <Waypoint routeStrategy="shortest">
                           <Position>
-                            <WorldPosition x="88.628464" y="324.232758" z="0.1"/>
+                            <WorldPosition x="155.59584" y="133.552841" z="0.1"/>
                           </Position>
                         </Waypoint>
                         <Waypoint routeStrategy="shortest">
                           <Position>
-                            <WorldPosition x="89.136505" y="134.6409" z="0.1"/>
+                            <WorldPosition x="161.704605" y="133.519318" z="0.1"/>
                           </Position>
                         </Waypoint>
                         <Waypoint routeStrategy="shortest">
                           <Position>
-                            <WorldPosition x="88.035141" y="3.047402" z="0.1"/>
+                            <WorldPosition x="168.209564" y="133.763565" z="0.1"/>
                           </Position>
                         </Waypoint>
                       </Route>
@@ -201,12 +206,12 @@
                   <Condition name="" delay="0" conditionEdge="rising">
                     <ByEntityCondition>
                       <TriggeringEntities triggeringEntitiesRule="any">
-                        <EntityRef entityRef="vehicle_dummy"/>
+                        <EntityRef entityRef="vehicle2"/>
                       </TriggeringEntities>
                       <EntityCondition>
                         <ReachPositionCondition tolerance="2">
                           <Position>
-                            <WorldPosition x="88.628464" y="324.232758" z="0.1"/>
+                            <WorldPosition x="155.59584" y="133.552841" z="0.1"/>
                           </Position>
                         </ReachPositionCondition>
                       </EntityCondition>
@@ -229,6 +234,13 @@
       </Act>
     </Story>
     <StopTrigger>
+      <ConditionGroup>
+        <Condition name="" delay="0" conditionEdge="rising">
+          <ByValueCondition>
+            <SimulationTimeCondition value="30" rule="greaterThan"/>
+          </ByValueCondition>
+        </Condition>
+      </ConditionGroup>
     </StopTrigger>
   </Storyboard>
 </OpenSCENARIO>

@@ -36,8 +36,9 @@ RMB for
   - Start inegrating the frenet controller, so then to tweak the sensors
   - Only make OpenScenario kill the vehicles when they have arrived and the AV arrived Or when the gamer presses terminate scenario.
 ================================================
-  - Stop game run from ending until AV arrives or player terminates or collision occuring for more than 5s- iF collision lasts for more than 5 sconds terminate game
-  - Replay function
+  - Stop game when timer runs out or player terminates scenario.  DONE
+  - Update AVs code with new file names and make sure 
+  - Replay function 
   - Display reason why score gained
 
   
@@ -54,4 +55,6 @@ ISSUES I FACED:
 - The back slahes in the following file "/home/abanoub_g/UnrealEngine_4.26/Engine/Binaries/ThirdParty/Python3/Linux/lib/python3.7/site-packages/pkg_resources/_vendor/pyparsing.py", were causing errors for importing pkg_resources. Solution: Went through file and removed new lines after backslashes or removed back slash and made code one line.
 
 - Cannot import numpy and getting a lot of issues with exeuting scenario runner through.  I tried to put numpy as a library in under Content/Python and that didn't work. I also tried to change the directory path so unreal uses the local python directory of the machine by adding this export UE_PYTHON_DIR=/usr/bin/python3 envrionment variable to .bashrc and that didn't change the path of the python being used by UE4. Solution: for now execute Python script independntly that monitors if a variable changes in a txt file. I fit does then it excutes scenario runner. If it changes then it kills scenario runner. This script would need to be run indepnetly of the game for now.
+
+- Scenario Runner terminates Scenario as soon as all of the actors arrive to their destinations. I tried different techniques for setting up the Triggers to delay the destroy of the the vehicles but they all didn't work. It might be something embeded with in the Scneario Runner manager developed by CARLA. SOLUTION: my work around for the problem was to spawn a dummy vehicle that dirves around in the map to keep scenario runner executing. This dummy vehicle runs out of the Game window so should not affect the player.  There is also a timer for each run. A single scenario run will not exceed the timer limit and the dummy vehicle should roam around for more than the timer limit so as to keep the scenario runner vehicles in the game unless the gamer terminates the run.
 
